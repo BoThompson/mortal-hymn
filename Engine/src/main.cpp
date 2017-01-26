@@ -15,8 +15,12 @@ static const GLfloat points[] = {-1, 0, 0,
 								 0, 1, 0};
 GLuint vbo;
 
-
-
+/**
+ * Draws the scene (TEMPORARY FUNCTION)
+ *
+ * @author Ulysee "Bo" Thompson
+ * @date 1/26/2017
+ */
 void draw()
 {
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
