@@ -6,6 +6,7 @@
 #ifndef _DEBUG
 #include <windows.h>
 #endif
+#include <SFML/Graphics.hpp>
 
 #ifdef _DEBUG
 /**
@@ -42,5 +43,15 @@ int APIENTRY WinMain(
 )
 #endif
 {
+	sf::Window window(sf::VideoMode(800, 600), "Mortal Hymn");
+	while (window.isOpen())
+	{
+		sf::Event event;
+		while (window.pollEvent(event))
+		{
+			if (event.type == sf::Event::Closed)
+				window.close();
+		}
+	}
 	return 0;
 }
