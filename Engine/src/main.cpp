@@ -9,11 +9,30 @@
 #include <GL/glew.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
+#ifdef _DEBUG
+#undef _DEBUG
+#include <python.h>
+#define _DEBUG
+#else
+#include <python.h>
+#endif
+
+#ifdef _WIN32
+#include <direct.h>
+ // MSDN recommends against using getcwd & chdir names
+#define cwd _getcwd
+#define cd _chdir
+#else
+#include "unistd.h"
+#define cwd getcwd
+#define cd chdir
+#endif
 
 static const GLfloat points[] = {-1, 0, 0,
 								 1, 0, 0,
 								 0, 1, 0};
 GLuint vbo;
+
 
 /**
  * Draws the scene (TEMPORARY FUNCTION)
@@ -29,6 +48,92 @@ void draw()
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 	glDisableVertexAttribArray(0);
 }
+
+char cwd_path[4096];
+/**
+ * Tests the embedded Python.
+ *
+ * @author Ulysee "Bo" Thompson
+ * @date 1/26/2017
+ *
+ * @return Exit-code for the process - 0 for success, else an error code.
+ */
+
+int python_test()
+{
+	
+	PyObject *pName, *pModule, *pDict, *pFunc;
+	// Initialize the Python Interpreter
+	Py_Initialize();
+#ifdef _WIN32
+	char tmp_path[4096];
+	cwd(tmp_path, sizeof tmp_path);
+	char *p2 = cwd_path;
+	*p2++ = '\'';
+	for (char *ptr = tmp_path; *ptr != '\0'; ptr++)
+	{
+		if(*ptr == '\\')
+		{
+			*p2++ = '\\';
+		}
+		*p2++ = *ptr;
+	}
+	*p2++ = '\'';
+	*p2++ = '\0';
+#else
+	cwd(cwd_path, sizeof cwd_path);
+#endif
+	// Build the name object
+	pName = PyUnicode_FromString("tstr");
+	printf(cwd_path);
+	printf("\n");
+	PyRun_SimpleString("import sys");
+	//PyRun_SimpleString("print(sys.path)");
+	sprintf_s(tmp_path, "sys.path.append(%s)", cwd_path);
+	//PyRun_SimpleString(tmp_path);
+	//PyRun_SimpleString("print(sys.path)");
+	// Load the module object
+	if ((pModule = PyImport_Import(pName)) == NULL)
+	{
+		PyErr_Print();
+		return -1;
+	}
+	else if (!PyModule_Check(pModule)) {
+
+	}
+	else {
+		PyModuleDef *def = PyModule_GetDef(pModule);
+		PyErr_Print();
+		//printf("Module name: %s\n", def->m_name);
+		//printf("Module doc: %s\n", def->m_doc);
+	}
+
+	// pDict is a borrowed reference 
+	pDict = PyModule_GetDict(pModule);
+	PyErr_Print();
+	// pFunc is also a borrowed reference 
+	pFunc = PyDict_GetItemString(pDict, "testfun");
+
+	if (PyCallable_Check(pFunc))
+	{
+		PyObject_CallObject(pFunc, NULL);
+	}
+	else
+	{
+		PyErr_Print();
+	}
+
+	// Clean up
+	Py_DECREF(pModule);
+	Py_DECREF(pName);
+
+	// Finish the Python Interpreter
+	Py_Finalize();
+	return 0;
+}
+
+
+
 
 #ifdef _DEBUG
 /**
@@ -83,6 +188,7 @@ int APIENTRY WinMain(
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
+	python_test();
 	while (window.isOpen())
 	{
 		sf::Event event;
