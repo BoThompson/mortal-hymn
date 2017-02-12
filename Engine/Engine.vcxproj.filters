@@ -16,15 +16,44 @@
     <Filter Include="Scripts">
       <UniqueIdentifier>{e29f2008-c4f1-4307-a56a-f55c484e6f6a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{355d4d73-5cee-4dce-bad2-dc08086ed94c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\scripts.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\actor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\scripts\tstr.py">
-      <Filter>Scripts</Filter>
+    <ClInclude Include="include\scripts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\actor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\entity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Mortal Hymn\shaders\test.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Mortal Hymn\shaders\test.vert">
+      <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
 </Project>

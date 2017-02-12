@@ -69,13 +69,13 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(PYTHON)\python36-32\include;C:\Libraries\glew-2.0.0\include;C:\Libraries\SFML-2.4.1\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\Owner\Documents\Mortal Hymn\Engine\include;$(PYTHON)\python36-32\include;C:\Libraries\glew-2.0.0\include;C:\Libraries\SFML-2.4.1\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(PYTHON)\python36-32\libs;C:\Libraries\glew-2.0.0\lib\Release\Win32;C:\Libraries\SFML-2.4.1\lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)</OutDir>
     <TargetName>$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(PYTHON)\include;C:\Libraries\glew-2.0.0\include;C:\Libraries\SFML-2.4.1\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\Owner\Documents\Mortal Hymn\Engine\include;$(PYTHON)\include;C:\Libraries\glew-2.0.0\include;C:\Libraries\SFML-2.4.1\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(PYTHON)\libs;C:\Libraries\glew-2.0.0\lib\Release\Win32;C:\Libraries\SFML-2.4.1\lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)</OutDir>
   </PropertyGroup>
@@ -128,10 +128,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\actor.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\scripts.cpp" />
+    <ClCompile Include="src\shader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\scripts\tstr.py" />
+    <ClInclude Include="include\actor.h" />
+    <ClInclude Include="include\entity.h" />
+    <ClInclude Include="include\scripts.h" />
+    <ClInclude Include="include\shader.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Mortal Hymn\shaders\test.frag" />
+    <None Include="..\Mortal Hymn\shaders\test.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
