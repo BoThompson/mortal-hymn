@@ -22,9 +22,12 @@
 #define cwd getcwd
 #define cd chdir
 #endif
+#include <GL/glew.h>
+#include <glm\glm.hpp>
+#include <vector>
 #include "scripts.h"
 #include "actor.h"
-
+#include "entity.h"
 
 char cwd_path[4096];
 std::map<std::string, PyObject*> modules;
@@ -152,14 +155,19 @@ PyObject *NewFSM(const char* const fsmName)
 
 }
 
-static PyObject *
-spam_system(PyObject *self, PyObject *args)
+static Entity *ObjectAsEntity(PyObject *ptrObj)
 {
-	const char *command;
+	return (Entity *)PyCapsule_GetPointer(ptrObj, "pointer");;
+}
+static PyObject *spam_system(PyObject *self, PyObject *args)
+{
+	PyObject *ptrObj;
 	int sts;
 
-	if (!PyArg_ParseTuple(args, "s", &command))
+	if (!PyArg_ParseTuple(args, "O", &ptrObj))
 		return NULL;
-	sts = system(command);
-	return Py_BuildValue("i", sts);
+
+	Entity *entity = ObjectAsEntity(ptrObj);
+	entity->Translate(glm::vec3(1, 0, 0));
+	return Py_BuildValue("");
 }

@@ -129,6 +129,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\actor.cpp" />
+    <ClCompile Include="src\entity.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\scripts.cpp" />
     <ClCompile Include="src\shader.cpp" />

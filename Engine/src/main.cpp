@@ -24,21 +24,22 @@
 #include "scripts.h"
 #include "actor.h"
 #include "shader.h"
+#include "entity.h"
 
-
-static const GLfloat points[] = {-1, 0, -10,
-								 1, 0, -10,
-								 0, 1, -10,
+static const std::vector<glm::vec3> points = {
+								{-1, 0, -10},
+								{1, 0, -10},
+								{0, 1, -10},
 
 								//Colors!
-								 1, .5, 1,
-								 .5, 1, 0,
-								 0, .5, 1,
+								{1, .5, 1},
+								{.5, 1, 0},
+								{0, .5, 1},
 
-	//Barycentric!
-	1, 0, 0,
-	0, 1, 0,
-	0, 0, 1 };
+								//Barycentric!
+								{1, 0, 0 },
+								{0, 1, 0 },
+								{0, 0, 1 } };
 GLuint vbo;
 
 
@@ -55,7 +56,7 @@ void draw()
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, points.size() * sizeof(glm::vec3), &points[0].x, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*) (9 * sizeof(GLfloat)));
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)(18 * sizeof(GLfloat)));
@@ -101,6 +102,7 @@ int APIENTRY WinMain(
  * @return An APIENTRY.
  */
 {
+	Entity entity;
 	sf::ContextSettings settings;
 	int err;
 	sf::Clock clock;
@@ -125,11 +127,16 @@ int APIENTRY WinMain(
 		printf("Error: %s\n", glewGetErrorString(err));
 		return -1;
 	}
+	printf("%f %f %f\n%f %f %f\n",
+		points[0].x, *(&points[0].x + 1), *(&points[0].x + 2),
+		*(&points[0].x + 3), *(&points[0].x + 4), *(&points[0].x + 5));
 	glEnable(GL_DEPTH_TEST); // enable depth-testing
 	glDepthFunc(GL_LESS); // depth-testing interprets a smaller value as "closer"
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
+
+	entity.SetVertices(points);
+	glBufferData(GL_ARRAY_BUFFER, entity.Vertices().size() * sizeof(glm::vec3), &entity.Vertices()[0][0], GL_STATIC_DRAW);
 	shader.LoadFragmentShader("test.frag");
 	shader.LoadVertexShader("test.vert");
 	shader.LinkShader();
