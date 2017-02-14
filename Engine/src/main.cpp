@@ -7,9 +7,10 @@
 #include <windows.h>
 #endif
 #include <GL/glew.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
-
 #ifdef _WIN32
 #include <direct.h>
  // MSDN recommends against using getcwd & chdir names
@@ -25,9 +26,19 @@
 #include "shader.h"
 
 
-static const GLfloat points[] = {-1, 0, 0,
-								 1, 0, 0,
-								 0, 1, 0};
+static const GLfloat points[] = {-1, 0, -10,
+								 1, 0, -10,
+								 0, 1, -10,
+
+								//Colors!
+								 1, .5, 1,
+								 .5, 1, 0,
+								 0, .5, 1,
+
+	//Barycentric!
+	1, 0, 0,
+	0, 1, 0,
+	0, 0, 1 };
 GLuint vbo;
 
 
@@ -39,11 +50,19 @@ GLuint vbo;
  */
 void draw()
 {
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
 	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*) (9 * sizeof(GLfloat)));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)(18 * sizeof(GLfloat)));
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(2);
 }
 
 
@@ -92,6 +111,14 @@ int APIENTRY WinMain(
 	settings.majorVersion = 3;
 	settings.minorVersion = 0;
 	Shader shader;
+	glm::mat4 modelMatrix = glm::mat4(1.0);
+	glm::mat4 projectionMatrix = glm::mat4(1.0);
+	glm::mat4 viewMatrix = glm::mat4(1.0);
+	glm::mat4  MVP;
+	glm::vec3 camVector = glm::vec3(0, 0, 1);
+	glm::vec3 triRotation = glm::vec3(0, 0, 0);
+	projectionMatrix = glm::perspective(glm::radians(35.0f), 800.0f / 600.0f, 1.0f, 100.0f);
+	//projectionMatrix = glm::ortho(0, 800, 0, 600);
 	sf::Window window(sf::VideoMode(800, 600), "Mortal Hymn", sf::Style::Default, settings);
 	if ((err = glewInit()) != GLEW_OK)
 	{
@@ -115,16 +142,51 @@ int APIENTRY WinMain(
 	while (window.isOpen())
 	{
 		sf::Event event;
+		triRotation = glm::vec3(0, 0, 0);
 		while (window.pollEvent(event))
 		{
 			if (event.type == sf::Event::Closed)
 				window.close();
+			if(event.type == sf::Event::KeyPressed)
+				switch (event.key.code)
+				{
+				case sf::Keyboard::Right:
+					camVector.x += .01;
+					break;
+				case sf::Keyboard::Left:
+					camVector.x -= .01;
+					break;
+				case sf::Keyboard::Up:
+					camVector.y += .01;
+					break;
+				case sf::Keyboard::Down:
+					camVector.y -= .01;
+					break;
+				case sf::Keyboard::A:
+					triRotation.z += .01;
+					break;
+				case sf::Keyboard::D:
+					triRotation.z -= .01;
+					break;
+				case sf::Keyboard::W:
+					triRotation.y += .01;
+					break;
+				case sf::Keyboard::S:
+					triRotation.y -= .01;
+					break;
+				}
 		}
 		// clear the buffers
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glUniform1f(shader.Uniform("baryFactor"), .2 + .1 * sinf(clock.getElapsedTime().asSeconds()));
+		viewMatrix = glm::lookAt(glm::vec3(camVector), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+		modelMatrix = glm::rotate(modelMatrix, triRotation.y, glm::vec3(0, 1, 0));
+		modelMatrix = glm::rotate(modelMatrix, triRotation.z, glm::vec3(0, 0, 1));
+		MVP = projectionMatrix * viewMatrix * modelMatrix;
+		glUniformMatrix4fv(shader.Uniform("MVP"), 1, GL_FALSE,  &MVP[0][0]);
 		draw();
 		window.display();
-		int elapsed = clock.restart().asMilliseconds();		
+		int elapsed = (clock.getElapsedTime() - last_time).asMilliseconds();
 		test_machine->Update(elapsed);
 		last_time = clock.getElapsedTime();
 		sf::sleep(sf::milliseconds(15 - elapsed));

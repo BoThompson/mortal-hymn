@@ -113,3 +113,16 @@ void Shader::Use()
 	if(_shaderProgramID)
 		glUseProgram(_shaderProgramID);
 }
+
+GLuint Shader::Uniform(std::string uniformName)
+{
+	std::map<std::string, GLuint>::iterator it;
+
+	it = uniforms.find(uniformName);
+	if (it != uniforms.end())
+		return it->second;
+	else {
+		uniforms[uniformName] = glGetUniformLocation(_shaderProgramID, uniformName.c_str());
+		return uniforms[uniformName];
+	}
+}

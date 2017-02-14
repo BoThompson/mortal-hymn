@@ -1,5 +1,14 @@
 #version 400
+in vec4 fragmentColor;
+in vec3 fragmentBarycentric;
 out vec4 color;
+uniform float baryFactor;
 void main(){
-  color = vec4(gl_FragCoord.x / 1000, gl_FragCoord.y / 1000, 0, 1);
+  if(fragmentBarycentric.x < baryFactor
+  || fragmentBarycentric.y < baryFactor
+  || fragmentBarycentric.z < baryFactor)
+	color = fragmentColor;
+  else
+	discard;
+	//color = vec4(1, 1, 0, 1);
 }

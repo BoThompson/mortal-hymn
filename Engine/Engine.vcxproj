@@ -69,13 +69,13 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\Owner\Documents\Mortal Hymn\Engine\include;$(PYTHON)\python36-32\include;C:\Libraries\glew-2.0.0\include;C:\Libraries\SFML-2.4.1\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\Owner\Documents\Mortal Hymn\Engine\include;C:\Libraries\glm;$(PYTHON)\python36-32\include;C:\Libraries\glew-2.0.0\include;C:\Libraries\SFML-2.4.1\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(PYTHON)\python36-32\libs;C:\Libraries\glew-2.0.0\lib\Release\Win32;C:\Libraries\SFML-2.4.1\lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)</OutDir>
     <TargetName>$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\Users\Owner\Documents\Mortal Hymn\Engine\include;$(PYTHON)\include;C:\Libraries\glew-2.0.0\include;C:\Libraries\SFML-2.4.1\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\Owner\Documents\Mortal Hymn\Engine\include;C:\Libraries\glm;$(PYTHON)\include;C:\Libraries\glew-2.0.0\include;C:\Libraries\SFML-2.4.1\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(PYTHON)\libs;C:\Libraries\glew-2.0.0\lib\Release\Win32;C:\Libraries\SFML-2.4.1\lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)</OutDir>
   </PropertyGroup>
