@@ -21,10 +21,11 @@
 #define cwd getcwd
 #define cd chdir
 #endif
+#include "entity.h"
 #include "scripts.h"
 #include "actor.h"
 #include "shader.h"
-#include "entity.h"
+
 
 static const std::vector<glm::vec3> points = {
 								{-1, 0, -10},
@@ -102,7 +103,7 @@ int APIENTRY WinMain(
  * @return An APIENTRY.
  */
 {
-	Entity entity;
+	Entity_T entity;
 	sf::ContextSettings settings;
 	int err;
 	sf::Clock clock;
@@ -142,7 +143,7 @@ int APIENTRY WinMain(
 	shader.LinkShader();
 		//printf("Shader successful\n");
 	setup_python();
-	Actor *test_machine = new Actor("testFSM");
+	Actor *test_machine = new Actor(&entity, "testFSM");
 	last_time = clock.getElapsedTime();
 	int i = 0;
 	shader.Use();
@@ -187,11 +188,10 @@ int APIENTRY WinMain(
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glUniform1f(shader.Uniform("baryFactor"), .2 + .1 * sinf(clock.getElapsedTime().asSeconds()));
 		viewMatrix = glm::lookAt(glm::vec3(camVector), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
-		modelMatrix = glm::rotate(modelMatrix, triRotation.y, glm::vec3(0, 1, 0));
-		modelMatrix = glm::rotate(modelMatrix, triRotation.z, glm::vec3(0, 0, 1));
-		MVP = projectionMatrix * viewMatrix * modelMatrix;
+		MVP = projectionMatrix * viewMatrix;
 		glUniformMatrix4fv(shader.Uniform("MVP"), 1, GL_FALSE,  &MVP[0][0]);
-		draw();
+		entity.Draw(shader, MVP);
+		//draw();
 		window.display();
 		int elapsed = (clock.getElapsedTime() - last_time).asMilliseconds();
 		test_machine->Update(elapsed);

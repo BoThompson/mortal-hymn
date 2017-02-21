@@ -9,8 +9,9 @@
 #else
 #include <python.h>
 #endif
-
 #include <map>
+#include "shader.h"
+
 int setup_python();
 void shutdown_python();
 PyObject *load_module(const char * const module_name);

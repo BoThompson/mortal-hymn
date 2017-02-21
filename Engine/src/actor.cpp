@@ -1,4 +1,8 @@
+#include <gl\glew.h>
+#include <glm\glm.hpp>
+#include <vector>
 #include "scripts.h"
+#include "entity.h"
 #include "actor.h"
 
 
@@ -8,7 +12,7 @@
  * @author Ulysee "Bo" Thompson
  * @date 2/9/2017
  */
-Actor::Actor(const char *fsmName)
+Actor::Actor(Entity_T *entity, const char *fsmName)
 {
 	PyObject *pResult;
 	_state = -100;
@@ -22,7 +26,12 @@ Actor::Actor(const char *fsmName)
 		return;
 	}else
 	{
+		_entity = entity;
+		PyObject *actor = PyCapsule_New(entity, "pointer", NULL);
+		PyObject_SetAttrString(_FSM, "pointer", actor);
+
 		pResult = PyObject_CallMethod(_FSM, "start", NULL);
+		
 		_state = _PyLong_AsInt(PyObject_GetAttrString(_FSM, "state"));
 		_timer = _PyLong_AsInt(PyObject_GetAttrString(_FSM, "timer"));
 	}
@@ -107,4 +116,23 @@ void Actor::Update(int delta)
 		_state = _PyLong_AsInt(PyObject_GetAttrString(_FSM, "state"));
 		_timer = _PyLong_AsInt(PyObject_GetAttrString(_FSM, "timer"));
 	}
+}
+
+Entity_T *Actor::Entity()
+{
+	return _entity;
+}
+
+/**
+ * Sets an entity.
+ *
+ * @author Ulysee "Bo" Thompson
+ * @date 2/20/2017
+ *
+ * @param [in,out] entity If non-null, the entity.
+ */
+
+void Actor::SetEntity(Entity_T *entity)
+{
+	_entity = entity;
 }

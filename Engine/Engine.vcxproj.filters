@@ -58,5 +58,8 @@
     <None Include="..\Mortal Hymn\shaders\test.vert">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="..\Mortal Hymn\scripts\testFSM.py">
+      <Filter>Scripts</Filter>
+    </None>
   </ItemGroup>
 </Project>

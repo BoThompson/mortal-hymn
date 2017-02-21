@@ -3,7 +3,6 @@
  *
  * Implements the scripts class.
  */
-
 #ifdef _DEBUG
 #undef _DEBUG
 #include <python.h>
@@ -26,11 +25,98 @@
 #include <glm\glm.hpp>
 #include <vector>
 #include "scripts.h"
-#include "actor.h"
 #include "entity.h"
+#include "actor.h"
+
 
 char cwd_path[4096];
 std::map<std::string, PyObject*> modules;
+
+static Entity_T *ObjectAsEntity(PyObject *ptrObj)
+{
+	return (Entity_T *)PyCapsule_GetPointer(ptrObj, "pointer");;
+}
+
+
+
+
+/**
+ * Translates.
+ *
+ * @author Ulysee "Bo" Thompson
+ * @date 2/20/2017
+ *
+ * @param [in,out] self If non-null, the class instance that this method operates on.
+ * @param [in,out] args If non-null, the arguments.
+ *
+ * @return Null if it fails, else a pointer to a PyObject.
+ */
+
+static PyObject *Translate(PyObject *self, PyObject *args)
+{
+	PyObject *ptrObj;
+	int sts;
+	float x, y, z;
+	if (!PyArg_ParseTuple(args, "Offf", &ptrObj, &x, &y, &z))
+		return NULL;
+	Entity_T *entity = ObjectAsEntity(ptrObj);
+	entity->Translate(glm::vec3(x, y, z));
+	//printf("Translate was called.\n");
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+static PyObject *GetPosition(PyObject *self, PyObject *args)
+{
+	PyObject *ptrObj;
+
+	int sts;
+	glm::vec3 pos;
+	if (!PyArg_ParseTuple(args, "O", &ptrObj))
+		return NULL;
+	Entity_T *entity = ObjectAsEntity(ptrObj);
+	pos = entity->Position();
+	PyObject *object = Py_BuildValue("(fff)", pos.x, pos.y, pos.z);
+	return object;
+}
+
+/** The interface methods[]. */
+static PyMethodDef InterfaceMethods[] = {
+	{ "translate", Translate, METH_VARARGS, "Translates a game entity." },
+	{ "getposition", GetPosition, METH_VARARGS, "Retrieves the position of a game entity"},
+	{ NULL, NULL, 0, NULL }
+};
+
+/**
+* A py module definition.
+*
+* @author Ulysee "Bo" Thompson
+* @date 2/20/2017
+*/
+
+static struct PyModuleDef InterfaceModule = {
+	PyModuleDef_HEAD_INIT,
+	"game",
+	NULL,
+	-1,
+	InterfaceMethods
+};
+
+/**
+* Py init interface.
+*
+* @author Ulysee "Bo" Thompson
+* @date 2/20/2017
+*
+* @return A PyMODINIT_FUNC.
+*/
+
+PyMODINIT_FUNC PyInit_Interface(void)
+{
+	 return PyModule_Create(&InterfaceModule);
+}
+
+
 /**
  * Sets up the python.
  *
@@ -42,8 +128,12 @@ std::map<std::string, PyObject*> modules;
 int setup_python()
 {
 	PyObject *pCwd;
+
+	//Add the game interface module
+	PyImport_AppendInittab("game", PyInit_Interface);
 	// Initialize the Python Interpreter
 	Py_Initialize();
+	PyImport_ImportModule("game");
 #ifdef _WIN32
 	char tmp_path[4096];
 	cwd(tmp_path, sizeof tmp_path);
@@ -69,6 +159,9 @@ int setup_python()
 	PyList_Insert(syspath, 0, pCwd);
 	return 0;
 }
+
+
+
 
 /**
  * Shutdown python.
@@ -126,7 +219,7 @@ PyObject *load_module(const char * const module_name)
 	//	PyErr_Print();
 	//}
 
-
+	
 	return pModule;
 }
 
@@ -155,19 +248,3 @@ PyObject *NewFSM(const char* const fsmName)
 
 }
 
-static Entity *ObjectAsEntity(PyObject *ptrObj)
-{
-	return (Entity *)PyCapsule_GetPointer(ptrObj, "pointer");;
-}
-static PyObject *spam_system(PyObject *self, PyObject *args)
-{
-	PyObject *ptrObj;
-	int sts;
-
-	if (!PyArg_ParseTuple(args, "O", &ptrObj))
-		return NULL;
-
-	Entity *entity = ObjectAsEntity(ptrObj);
-	entity->Translate(glm::vec3(1, 0, 0));
-	return Py_BuildValue("");
-}

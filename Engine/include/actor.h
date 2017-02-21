@@ -5,11 +5,14 @@ class Actor
 	int _timer;
 	int _state;
 	PyObject *_FSM;
+	class Entity_T *_entity;
 	Actor();
 public:
-	Actor(const char *fsmName);
+	Actor(Entity_T *entity, const char *fsmName);
 	void SetTimer(int timer);
 	int Timer();
+	void SetEntity(class Entity_T *entity);
+	class Entity_T *Entity();
 	void SetState(int state);
 	int State();
 	void Update(int delta);

@@ -141,6 +141,7 @@
     <ClInclude Include="include\shader.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\Mortal Hymn\scripts\testFSM.py" />
     <None Include="..\Mortal Hymn\shaders\test.frag" />
     <None Include="..\Mortal Hymn\shaders\test.vert" />
   </ItemGroup>
