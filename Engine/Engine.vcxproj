@@ -130,6 +130,7 @@
   <ItemGroup>
     <ClCompile Include="src\actor.cpp" />
     <ClCompile Include="src\entity.cpp" />
+    <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\scripts.cpp" />
     <ClCompile Include="src\shader.cpp" />
@@ -137,6 +138,7 @@
   <ItemGroup>
     <ClInclude Include="include\actor.h" />
     <ClInclude Include="include\entity.h" />
+    <ClInclude Include="include\game.h" />
     <ClInclude Include="include\scripts.h" />
     <ClInclude Include="include\shader.h" />
   </ItemGroup>
@@ -144,6 +146,8 @@
     <None Include="..\Mortal Hymn\scripts\testFSM.py" />
     <None Include="..\Mortal Hymn\shaders\test.frag" />
     <None Include="..\Mortal Hymn\shaders\test.vert" />
+    <None Include="..\Mortal Hymn\shaders\uv.frag" />
+    <None Include="..\Mortal Hymn\shaders\uv.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

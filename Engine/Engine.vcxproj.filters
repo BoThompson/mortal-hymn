@@ -19,6 +19,12 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{355d4d73-5cee-4dce-bad2-dc08086ed94c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\Test">
+      <UniqueIdentifier>{a7247c10-d01a-4594-8ec6-26fb0d850e42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\UV">
+      <UniqueIdentifier>{74924a06-7b3f-40f7-9bb1-245eb1dc8ec2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -36,6 +42,9 @@
     <ClCompile Include="src\entity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\scripts.h">
@@ -50,16 +59,25 @@
     <ClInclude Include="include\shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Mortal Hymn\shaders\test.frag">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\Mortal Hymn\shaders\test.vert">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="..\Mortal Hymn\scripts\testFSM.py">
       <Filter>Scripts</Filter>
+    </None>
+    <None Include="..\Mortal Hymn\shaders\test.frag">
+      <Filter>Shaders\Test</Filter>
+    </None>
+    <None Include="..\Mortal Hymn\shaders\test.vert">
+      <Filter>Shaders\Test</Filter>
+    </None>
+    <None Include="..\Mortal Hymn\shaders\uv.frag">
+      <Filter>Shaders\UV</Filter>
+    </None>
+    <None Include="..\Mortal Hymn\shaders\uv.vert">
+      <Filter>Shaders\UV</Filter>
     </None>
   </ItemGroup>
 </Project>

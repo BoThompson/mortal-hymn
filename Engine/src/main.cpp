@@ -21,29 +21,49 @@
 #define cwd getcwd
 #define cd chdir
 #endif
+#include "game.h"
 #include "entity.h"
 #include "scripts.h"
 #include "actor.h"
 #include "shader.h"
 
+static const std::vector<glm::vec2> UVs = {
+	{0, 0},
+	{1, 1},
+	{0, 1},
+
+	{0, 0},
+	{1, 0},
+	{1, 1}
+};
 
 static const std::vector<glm::vec3> points = {
-								{-1, 0, -10},
-								{1, 0, -10},
-								{0, 1, -10},
+	//Upper Left Triangle
+	{ -1, -1, -10 },
+	{ 1, 1, -10 },
+	{ -1, 1, -10 },
+	//Lower Right Triangle
+	{ -1, -1, -10 },
+	{ 1, -1, -10 },
+	{ 1, 1, -10 }
+
 
 								//Colors!
-								{1, .5, 1},
-								{.5, 1, 0},
-								{0, .5, 1},
+								//{1, .5, 1},
+								//{.5, 1, 0},
+								//{0, .5, 1},
 
 								//Barycentric!
-								{1, 0, 0 },
-								{0, 1, 0 },
-								{0, 0, 1 } };
+								//{1, 0, 0 },
+								//{0, 1, 0 },
+								//{0, 0, 1 }
+}
+;
 GLuint vbo;
+GLuint UVbo;
 
-
+#define SCREEN_WIDTH 1200.0f
+#define SCREEN_HEIGHT 1600.0f
 /**
  * Draws the scene (TEMPORARY FUNCTION)
  *
@@ -68,7 +88,7 @@ void draw()
 }
 
 
-
+Game *game;
 
 
 /**
@@ -120,9 +140,10 @@ int APIENTRY WinMain(
 	glm::mat4  MVP;
 	glm::vec3 camVector = glm::vec3(0, 0, 1);
 	glm::vec3 triRotation = glm::vec3(0, 0, 0);
-	projectionMatrix = glm::perspective(glm::radians(35.0f), 800.0f / 600.0f, 1.0f, 100.0f);
+	projectionMatrix = glm::perspective(glm::radians(35.0f), SCREEN_HEIGHT / SCREEN_WIDTH, 1.0f, 100.0f);
+	game = new Game();
 	//projectionMatrix = glm::ortho(0, 800, 0, 600);
-	sf::Window window(sf::VideoMode(800, 600), "Mortal Hymn", sf::Style::Default, settings);
+	sf::Window window(sf::VideoMode(SCREEN_HEIGHT, SCREEN_WIDTH), "Mortal Hymn", sf::Style::Default, settings);
 	if ((err = glewInit()) != GLEW_OK)
 	{
 		printf("Error: %s\n", glewGetErrorString(err));
@@ -134,14 +155,23 @@ int APIENTRY WinMain(
 	glEnable(GL_DEPTH_TEST); // enable depth-testing
 	glDepthFunc(GL_LESS); // depth-testing interprets a smaller value as "closer"
 	glGenBuffers(1, &vbo);
+	glGenBuffers(1, &UVbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
 	entity.SetVertices(points);
 	glBufferData(GL_ARRAY_BUFFER, entity.Vertices().size() * sizeof(glm::vec3), &entity.Vertices()[0][0], GL_STATIC_DRAW);
-	shader.LoadFragmentShader("test.frag");
-	shader.LoadVertexShader("test.vert");
+	glBindBuffer(GL_ARRAY_BUFFER, UVbo);
+	entity.SetUVs(UVs);
+	glBufferData(GL_ARRAY_BUFFER, entity.UVs().size() * sizeof(glm::vec2), &entity.UVs()[0][0], GL_STATIC_DRAW);
+	shader.LoadFragmentShader("uv.frag");
+	shader.LoadVertexShader("uv.vert");
 	shader.LinkShader();
-		//printf("Shader successful\n");
+	shader.SetName("UV");
+	sf::Texture texPic;
+	sf::Image imagePic;
+	imagePic.loadFromFile("images\\test.png");
+	imagePic.flipVertically();
+	texPic.loadFromImage(imagePic);
+	entity.SetTexture(&texPic);
 	setup_python();
 	Actor *test_machine = new Actor(&entity, "testFSM");
 	last_time = clock.getElapsedTime();
@@ -159,44 +189,44 @@ int APIENTRY WinMain(
 				switch (event.key.code)
 				{
 				case sf::Keyboard::Right:
-					camVector.x += .01;
+					camVector.x += .01f;
 					break;
 				case sf::Keyboard::Left:
-					camVector.x -= .01;
+					camVector.x -= .01f;
 					break;
 				case sf::Keyboard::Up:
-					camVector.y += .01;
+					camVector.y += .01f;
 					break;
 				case sf::Keyboard::Down:
-					camVector.y -= .01;
+					camVector.y -= .01f;
 					break;
 				case sf::Keyboard::A:
-					triRotation.z += .01;
+					triRotation.z += .01f;
 					break;
 				case sf::Keyboard::D:
-					triRotation.z -= .01;
+					triRotation.z -= .01f;
 					break;
 				case sf::Keyboard::W:
-					triRotation.y += .01;
+					triRotation.y += .01f;
 					break;
 				case sf::Keyboard::S:
-					triRotation.y -= .01;
+					triRotation.y -= .01f;
 					break;
 				}
 		}
 		// clear the buffers
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glUniform1f(shader.Uniform("baryFactor"), .2 + .1 * sinf(clock.getElapsedTime().asSeconds()));
+		//glUniform1f(shader.Uniform("baryFactor"), .2f + .1f * sinf(clock.getElapsedTime().asSeconds()));
 		viewMatrix = glm::lookAt(glm::vec3(camVector), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 		MVP = projectionMatrix * viewMatrix;
 		glUniformMatrix4fv(shader.Uniform("MVP"), 1, GL_FALSE,  &MVP[0][0]);
 		entity.Draw(shader, MVP);
 		//draw();
 		window.display();
-		int elapsed = (clock.getElapsedTime() - last_time).asMilliseconds();
-		test_machine->Update(elapsed);
-		last_time = clock.getElapsedTime();
-		sf::sleep(sf::milliseconds(15 - elapsed));
+		sf::Time delta = game->Delta();
+		test_machine->Update(delta.asMilliseconds());
+		game->Update();
+		sf::sleep(sf::milliseconds(15 - delta.asMilliseconds()));
 	}
 	shutdown_python();
 	return 0;

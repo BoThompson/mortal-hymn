@@ -18,8 +18,8 @@ class testFSM:
 	
 	def update(self):
 		self.position = game.getposition(self.pointer)
-		print(str(self.position))
+		print(str(game.time()))
 		self.timer = 10
-		self.translate(.1, 0, 0)
+		self.setrotation(6.28 / game.time() / , 0, 0)
 		
 		

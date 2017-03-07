@@ -7,6 +7,11 @@
 
 const std::string shader_file_path = "shaders";
 
+void Shader::SetName(std::string name)
+{
+	_name = name;
+}
+
 
 bool Shader::LoadVertexShader(std::string filename)
 {
@@ -88,7 +93,8 @@ bool Shader::LinkShader()
 	glAttachShader(_shaderProgramID, _vertexShaderID);
 	glAttachShader(_shaderProgramID, _fragmentShaderID);
 	glLinkProgram(_shaderProgramID);
-
+	if(_name == "")
+		_name = "ShaderProgram" + _shaderProgramID;
 	// Check the program
 	glGetProgramiv(_shaderProgramID, GL_LINK_STATUS, &Result);
 	glGetProgramiv(_shaderProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
@@ -125,4 +131,22 @@ GLuint Shader::Uniform(std::string uniformName)
 		uniforms[uniformName] = glGetUniformLocation(_shaderProgramID, uniformName.c_str());
 		return uniforms[uniformName];
 	}
+}
+
+Shader::Shader()
+{
+	_name = "";
+}
+
+Shader::Shader(std::string name)
+{
+	_name = name;
+}
+
+Shader::Shader(std::string name, std::string vertFilename, std::string fragFilename)
+{
+	_name = name;
+	LoadVertexShader(vertFilename);
+	LoadFragmentShader(fragFilename);
+	LinkShader();
 }

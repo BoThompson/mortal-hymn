@@ -13,32 +13,76 @@
 #include <string.h>
 #ifdef _WIN32
 #include <direct.h>
-// MSDN recommends against using getcwd & chdir names
+
+/**
+ * MSDN recommends against using getcwd & chdir names.
+ *
+ * @author Ulysee "Bo" Thompson
+ * @date 2/27/2017
+ */
+
 #define cwd _getcwd
+
+/**
+ * A macro that defines CD.
+ *
+ * @author Ulysee "Bo" Thompson
+ * @date 2/27/2017
+ */
+
 #define cd _chdir
 #else
 #include "unistd.h"
+
+/**
+ * A macro that defines cwd.
+ *
+ * @author Ulysee "Bo" Thompson
+ * @date 2/27/2017
+ */
+
 #define cwd getcwd
+
+/**
+ * A macro that defines CD.
+ *
+ * @author Ulysee "Bo" Thompson
+ * @date 2/27/2017
+ */
+
 #define cd chdir
 #endif
 #include <GL/glew.h>
+#include <SFML/Graphics.hpp>
+#include <SFML/OpenGL.hpp>
 #include <glm\glm.hpp>
 #include <vector>
+#include "game.h"
 #include "scripts.h"
 #include "entity.h"
 #include "actor.h"
 
 
+/** The cwd path[ 4096]. */
 char cwd_path[4096];
+/** The modules. */
 std::map<std::string, PyObject*> modules;
+
+/**
+ * Object as entity.
+ *
+ * @author Ulysee "Bo" Thompson
+ * @date 2/27/2017
+ *
+ * @param [in,out] ptrObj If non-null, the pointer object.
+ *
+ * @return Null if it fails, else a pointer to an Entity_T.
+ */
 
 static Entity_T *ObjectAsEntity(PyObject *ptrObj)
 {
 	return (Entity_T *)PyCapsule_GetPointer(ptrObj, "pointer");;
 }
-
-
-
 
 /**
  * Translates.
@@ -66,12 +110,61 @@ static PyObject *Translate(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+/**
+ * Rotates a passed game entity.
+ *
+ * @author Ulysee "Bo" Thompson
+ * @date 2/27/2017
+ *
+ * @param [in,out] self If non-null, the class instance that this method operates on.
+ * @param [in,out] args If non-null, the arguments from python.
+ *
+ * @return Null if it fails, else a pointer to a PyObject.
+ */
+
+static PyObject *Rotate(PyObject *self, PyObject *args)
+{
+	PyObject *ptrObj;
+	int sts;
+	float x, y, z;
+	if (!PyArg_ParseTuple(args, "Offf", &ptrObj, &x, &y, &z))
+		return NULL;
+	Entity_T *entity = ObjectAsEntity(ptrObj);
+	entity->SetRotation(glm::vec3(x, y, z));
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+static PyObject *Scale(PyObject *self, PyObject *args)
+{
+	PyObject *ptrObj;
+	int sts;
+	float x, y, z;
+	if (!PyArg_ParseTuple(args, "Offf", &ptrObj, &x, &y, &z))
+		return NULL;
+	Entity_T *entity = ObjectAsEntity(ptrObj);
+	entity->SetScale(glm::vec3(x, y, z));
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+/**
+ * Gets a position.
+ *
+ * @author Ulysee "Bo" Thompson
+ * @date 2/27/2017
+ *
+ * @param [in,out] self If non-null, the class instance that this method operates on.
+ * @param [in,out] args If non-null, the arguments.
+ *
+ * @return Null if it fails, else the position.
+ */
+
 static PyObject *GetPosition(PyObject *self, PyObject *args)
 {
 	PyObject *ptrObj;
-
-	int sts;
 	glm::vec3 pos;
+
 	if (!PyArg_ParseTuple(args, "O", &ptrObj))
 		return NULL;
 	Entity_T *entity = ObjectAsEntity(ptrObj);
@@ -80,19 +173,91 @@ static PyObject *GetPosition(PyObject *self, PyObject *args)
 	return object;
 }
 
+/**
+ * Gets a rotation.
+ *
+ * @author Ulysee "Bo" Thompson
+ * @date 2/27/2017
+ *
+ * @param [in,out] self If non-null, the class instance that this method operates on.
+ * @param [in,out] args If non-null, the arguments.
+ *
+ * @return Null if it fails, else the rotation.
+ */
+
+static PyObject *GetRotation(PyObject *self, PyObject *args)
+{
+	PyObject *ptrObj;
+	glm::vec3 rot;
+
+	if (!PyArg_ParseTuple(args, "O", &ptrObj))
+		return NULL;
+	Entity_T *entity = ObjectAsEntity(ptrObj);
+	rot = entity->Rotation();
+	PyObject *object = Py_BuildValue("(fff)", rot.x, rot.y, rot.z);
+	return object;
+}
+
+/**
+ * Gets a scale.
+ *
+ * @author Ulysee "Bo" Thompson
+ * @date 2/27/2017
+ *
+ * @param [in,out] self If non-null, the class instance that this method operates on.
+ * @param [in,out] args If non-null, the arguments.
+ *
+ * @return Null if it fails, else the scale.
+ */
+
+static PyObject *GetScale(PyObject *self, PyObject *args)
+{
+	PyObject *ptrObj;
+	glm::vec3 scl;
+
+	if (!PyArg_ParseTuple(args, "O", &ptrObj))
+		return NULL;
+	Entity_T *entity = ObjectAsEntity(ptrObj);
+	scl = entity->Scale();
+	PyObject *object = Py_BuildValue("(fff)", scl.x, scl.y, scl.z);
+	return object;
+}
+
+/**
+ * Gets a time.
+ *
+ * @author Ulysee "Bo" Thompson
+ * @date 2/27/2017
+ *
+ * @param [in,out] self If non-null, the class instance that this method operates on.
+ * @param [in,out] args If non-null, the arguments.
+ *
+ * @return Null if it fails, else the time.
+ */
+
+static PyObject *GetTime(PyObject *self, PyObject *args)
+{
+	PyObject *object = Py_BuildValue("i", game->Time().asMilliseconds());
+	return object;
+}
 /** The interface methods[]. */
 static PyMethodDef InterfaceMethods[] = {
-	{ "translate", Translate, METH_VARARGS, "Translates a game entity." },
-	{ "getposition", GetPosition, METH_VARARGS, "Retrieves the position of a game entity"},
+	{ "time",			GetTime,			METH_VARARGS, "Provides the game's current time (in milliseconds)" },
+	{ "scale",			Scale,			METH_VARARGS, "Scales a game entity." },
+	{ "rotate",			Rotate,			METH_VARARGS, "Rotates a game entity." },
+	{ "translate",		Translate,		METH_VARARGS, "Translates a game entity." },
+	{ "getposition",		GetPosition,		METH_VARARGS, "Retrieves the position of a game entity"},
+	{ "getrotation",		GetRotation,		METH_VARARGS, "Retrieves the rotation of a game entity" },
+	{ "getscale",		GetScale,		METH_VARARGS, "Retrieves the scale of a game entity" },
 	{ NULL, NULL, 0, NULL }
 };
 
 /**
-* A py module definition.
-*
-* @author Ulysee "Bo" Thompson
-* @date 2/20/2017
-*/
+ * A py module definition.
+ *
+ * @author Ulysee "Bo" Thompson
+ * @date 2/20/2017
+ */
 
 static struct PyModuleDef InterfaceModule = {
 	PyModuleDef_HEAD_INIT,
@@ -103,19 +268,18 @@ static struct PyModuleDef InterfaceModule = {
 };
 
 /**
-* Py init interface.
-*
-* @author Ulysee "Bo" Thompson
-* @date 2/20/2017
-*
-* @return A PyMODINIT_FUNC.
-*/
+ * Py init interface.
+ *
+ * @author Ulysee "Bo" Thompson
+ * @date 2/20/2017
+ *
+ * @return A PyMODINIT_FUNC.
+ */
 
 PyMODINIT_FUNC PyInit_Interface(void)
 {
 	 return PyModule_Create(&InterfaceModule);
 }
-
 
 /**
  * Sets up the python.
@@ -125,6 +289,7 @@ PyMODINIT_FUNC PyInit_Interface(void)
  *
  * @return An int.
  */
+
 int setup_python()
 {
 	PyObject *pCwd;
@@ -160,15 +325,13 @@ int setup_python()
 	return 0;
 }
 
-
-
-
 /**
  * Shutdown python.
  *
  * @author Ulysee "Bo" Thompson
  * @date 2/1/2017
  */
+
 void shutdown_python()
 {
 	// Clean up
@@ -189,6 +352,7 @@ void shutdown_python()
  *
  * @return Null if it fails, else the python.
  */
+
 PyObject *load_module(const char * const module_name)
 {
 
@@ -222,6 +386,17 @@ PyObject *load_module(const char * const module_name)
 	
 	return pModule;
 }
+
+/**
+ * Creates a new fsm.
+ *
+ * @author Ulysee "Bo" Thompson
+ * @date 2/27/2017
+ *
+ * @param fsmName Name of the fsm.
+ *
+ * @return Null if it fails, else a pointer to a PyObject.
+ */
 
 PyObject *NewFSM(const char* const fsmName)
 {
