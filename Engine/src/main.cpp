@@ -62,8 +62,8 @@ static const std::vector<glm::vec3> points = {
 GLuint vbo;
 GLuint UVbo;
 
-#define SCREEN_WIDTH 1200.0f
-#define SCREEN_HEIGHT 1600.0f
+#define SCREEN_WIDTH 1600.0f
+#define SCREEN_HEIGHT 1200.0f
 /**
  * Draws the scene (TEMPORARY FUNCTION)
  *
@@ -162,8 +162,10 @@ int APIENTRY WinMain(
 	glBindBuffer(GL_ARRAY_BUFFER, UVbo);
 	entity.SetUVs(UVs);
 	glBufferData(GL_ARRAY_BUFFER, entity.UVs().size() * sizeof(glm::vec2), &entity.UVs()[0][0], GL_STATIC_DRAW);
-	shader.LoadFragmentShader("uv.frag");
+	
 	shader.LoadVertexShader("uv.vert");
+	shader.LoadFragmentShader("uv.frag");
+
 	shader.LinkShader();
 	shader.SetName("UV");
 	sf::Texture texPic;
@@ -177,6 +179,10 @@ int APIENTRY WinMain(
 	last_time = clock.getElapsedTime();
 	int i = 0;
 	shader.Use();
+	//TESTING PYTHON SPEED
+	long int avg_ms = 0;
+	int progressCounter = 0;
+
 	while (window.isOpen())
 	{
 		sf::Event event;
@@ -224,7 +230,16 @@ int APIENTRY WinMain(
 		//draw();
 		window.display();
 		sf::Time delta = game->Delta();
-		test_machine->Update(delta.asMilliseconds());
+		for(int i = 0;i < 1000;i++)
+			test_machine->Update(delta.asMilliseconds());
+		long int ms = (game->Delta() - delta).asMicroseconds();
+		avg_ms += ms;
+		if (progressCounter++ == 1000)
+		{
+			printf("Time to process Python(avg of 1000 cycles): %fms\n", avg_ms / 1000.0 / 1000);
+			avg_ms = 0;
+			progressCounter = 0;
+		}
 		game->Update();
 		sf::sleep(sf::milliseconds(15 - delta.asMilliseconds()));
 	}

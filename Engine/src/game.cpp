@@ -7,6 +7,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
 #include <SFML/Graphics/Texture.hpp>
+#include <glm/glm.hpp>
 #include "game.h"
 
 /**
@@ -20,7 +21,7 @@
 
 sf::Time Game::Time()
 {
-	return _clock.getElapsedTime();
+	return m_clock.getElapsedTime();
 }
 
 /**
@@ -80,7 +81,7 @@ void Game::Draw()
 
 void Game::Update()
 {
-	_lastUpdateTime = _clock.getElapsedTime();
+	m_lastUpdateTime = m_clock.getElapsedTime();
 }
 
 /**
@@ -106,7 +107,7 @@ void Game::Shutdown()
 
 bool Game::Ended()
 {
-	return _ended;
+	return m_ended;
 }
 
 /**
@@ -120,21 +121,43 @@ bool Game::Ended()
 
 sf::Time Game::Delta()
 {
-	return  _clock.getElapsedTime() - _lastUpdateTime;
+	return  m_clock.getElapsedTime() - m_lastUpdateTime;
 }
 
 sf::Texture *Game::LoadTexture(std::string filename)
 {
 	sf::Texture *tex;
-	if (_textures.find(filename) != _textures.end())
+	if (m_textures.find(filename) != m_textures.end())
 	{
-		return _textures[filename];
+		return m_textures[filename];
 	}
 	else
 	{
 		tex = new sf::Texture();
 		tex->loadFromFile(filename);
-		_textures[filename] = tex;
+		m_textures[filename] = tex;
 		return tex;
 	}
+}
+
+glm::vec2 Game::Screen()
+{
+	return m_screen;
+}
+
+sf::Shader *LoadShader(std::string name, std::string vert_file, std::string frag_file)
+{
+
+}
+
+
+sf::Shader *Game::Shader(std::string name)
+{
+	std::map<std::string, Shader*>::iterator it;
+	if ((it = m_shaders.find(name)) != m_shaders.end())
+	{
+		return it.second;
+	}
+	else
+		return NULL;
 }

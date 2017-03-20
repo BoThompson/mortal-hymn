@@ -10,16 +10,16 @@ class testFSM:
 		
 	def start(self):
 		self.timer = 1000
-		print(str(self.state) + " is the state")
-		print(str(self.timer) + " is the timer")
+		#print(str(self.state) + " is the state")
+		#print(str(self.timer) + " is the timer")
 	
 	def translate(self, x, y, z):
 		game.translate(self.pointer, x, y, z)
 	
 	def update(self):
 		self.position = game.getposition(self.pointer)
-		print(str(game.time()))
+		#print(str(game.time()))
 		self.timer = 10
-		self.setrotation(6.28 / game.time() / , 0, 0)
+		self.translate(.1, 0, 0)
 		
 		

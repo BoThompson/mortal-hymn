@@ -1,5 +1,6 @@
 #include <gl\glew.h>
 #include <glm\glm.hpp>
+#include <SFML\graphics.hpp>
 #include <vector>
 #include "scripts.h"
 #include "entity.h"

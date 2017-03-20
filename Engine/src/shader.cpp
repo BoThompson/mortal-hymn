@@ -25,7 +25,7 @@ bool Shader::LoadVertexShader(std::string filename)
 		VertexShaderStream.close();
 	}
 	else {
-		printf("Impossible to open %s. Are you in the right directory ? Don't forget to read the FAQ !\n", shader_file_path.c_str());
+		printf("Failed to open %s. Path may be bad.\n", shader_file_path.c_str());
 		getchar();
 		return false;
 	}
@@ -61,7 +61,7 @@ bool Shader::LoadFragmentShader(std::string filename)
 		FragmentShaderStream.close();
 	}
 	else {
-		printf("Impossible to open %s. Are you in the right directory ? Don't forget to read the FAQ !\n", shader_file_path.c_str());
+		printf("Failed to open fragment shader %s. Path may be bad.\n", shader_file_path.c_str());
 		getchar();
 		return false;
 	}
