@@ -2,17 +2,17 @@
 class Actor
 {
 	
-	int _timer;
-	int _state;
-	PyObject *_FSM;
-	class Entity_T *_entity;
+	int m_timer;
+	int m_state;
+	PyObject *m_FSM;
+	class Entity *m_entity;
 	Actor();
 public:
-	Actor(Entity_T *entity, const char *fsmName);
+	Actor(Entity *entity, const char *fsmName);
 	void SetTimer(int timer);
 	int Timer();
-	void SetEntity(class Entity_T *entity);
-	class Entity_T *Entity();
+	void SetEntity(class Entity *entity);
+	Entity *GetEntity();
 	void SetState(int state);
 	int State();
 	void Update(int delta);

@@ -2,9 +2,7 @@
 #include <glm\glm.hpp>
 #include <SFML\graphics.hpp>
 #include <vector>
-#include "scripts.h"
-#include "entity.h"
-#include "actor.h"
+#include "game.h"
 
 
 /**
@@ -13,28 +11,28 @@
  * @author Ulysee "Bo" Thompson
  * @date 2/9/2017
  */
-Actor::Actor(Entity_T *entity, const char *fsmName)
+Actor::Actor(Entity *entity, const char *fsmName)
 {
 	PyObject *pResult;
-	_state = -100;
-	_timer = -100;
+	m_state = -100;
+	m_timer = -100;
 	if (load_module(fsmName) == NULL)
 	{
 
-	}else if((_FSM = NewFSM(fsmName)) == NULL)
+	}else if((m_FSM = NewFSM(fsmName)) == NULL)
 	{
 		printf("Error(FSM constructor): python class is null.");
 		return;
 	}else
 	{
-		_entity = entity;
+		m_entity = entity;
 		PyObject *actor = PyCapsule_New(entity, "pointer", NULL);
-		PyObject_SetAttrString(_FSM, "pointer", actor);
+		PyObject_SetAttrString(m_FSM, "pointer", actor);
 
-		pResult = PyObject_CallMethod(_FSM, "start", NULL);
+		pResult = PyObject_CallMethod(m_FSM, "start", NULL);
 		
-		_state = _PyLong_AsInt(PyObject_GetAttrString(_FSM, "state"));
-		_timer = _PyLong_AsInt(PyObject_GetAttrString(_FSM, "timer"));
+		m_state = _PyLong_AsInt(PyObject_GetAttrString(m_FSM, "state"));
+		m_timer = _PyLong_AsInt(PyObject_GetAttrString(m_FSM, "timer"));
 	}
 	//else
 	//{
@@ -54,7 +52,7 @@ Actor::Actor(Entity_T *entity, const char *fsmName)
  */
 void Actor::SetTimer(int timer)
 {
-	_timer = timer;
+	m_timer = timer;
 }
 
 /**
@@ -67,7 +65,7 @@ void Actor::SetTimer(int timer)
  */
 int Actor::Timer()
 {
-	return _timer;
+	return m_timer;
 }
 
 /**
@@ -80,7 +78,7 @@ int Actor::Timer()
  */
 void Actor::SetState(int state)
 {
-	_state = state;
+	m_state = state;
 }
 
 /**
@@ -93,7 +91,7 @@ void Actor::SetState(int state)
  */
 int Actor::State()
 {
-	return _state;
+	return m_state;
 }
 
 
@@ -107,21 +105,21 @@ int Actor::State()
  */
 void Actor::Update(int delta)
 {
-	if (_state < 0)
+	if (m_state < 0)
 		return;
-	if ((_timer -= delta) < 0)
+	if ((m_timer -= delta) < 0)
 	{
 		//Call the python FSM method
 		//Update the state
-		PyObject_CallMethod(_FSM, "update", NULL);
-		_state = _PyLong_AsInt(PyObject_GetAttrString(_FSM, "state"));
-		_timer = _PyLong_AsInt(PyObject_GetAttrString(_FSM, "timer"));
+		PyObject_CallMethod(m_FSM, "update", NULL);
+		m_state = _PyLong_AsInt(PyObject_GetAttrString(m_FSM, "state"));
+		m_timer = _PyLong_AsInt(PyObject_GetAttrString(m_FSM, "timer"));
 	}
 }
 
-Entity_T *Actor::Entity()
+Entity *Actor::GetEntity()
 {
-	return _entity;
+	return m_entity;
 }
 
 /**
@@ -133,7 +131,7 @@ Entity_T *Actor::Entity()
  * @param [in,out] entity If non-null, the entity.
  */
 
-void Actor::SetEntity(Entity_T *entity)
+void Actor::SetEntity(Entity *entity)
 {
-	_entity = entity;
+	m_entity = entity;
 }

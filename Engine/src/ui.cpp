@@ -1,9 +1,8 @@
 #include <GL\glew.h>
 #include <glm\glm.hpp>
 #include <SFML\Graphics.hpp>
-#include "sprite.h"
-#include "ui.h"
 #include "game.h"
+
 
 extern GLuint vbo;
 extern GLuint UVbo;
@@ -57,14 +56,14 @@ void UI::Update()
 
 void UI::Draw()
 {
-	glUseProgram(game->Shader("HUD"));
+	game->UseShader("HUD");
 	glEnableVertexAttribArray(0);
 	//glEnableVertexAttribArray(2);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, game->Vbo());
 	glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(glm::vec3), &m_vertices[0][0], GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, UVbo);
+	glBindBuffer(GL_ARRAY_BUFFER, game->UVbo());
 	glBufferData(GL_ARRAY_BUFFER, m_uvs.size() * sizeof(glm::vec2), &m_uvs[0][0], GL_STATIC_DRAW);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 	//glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)(18 * sizeof(GLfloat)));

@@ -79,9 +79,9 @@ std::map<std::string, PyObject*> modules;
  * @return Null if it fails, else a pointer to an Entity_T.
  */
 
-static Entity_T *ObjectAsEntity(PyObject *ptrObj)
+static Entity *ObjectAsEntity(PyObject *ptrObj)
 {
-	return (Entity_T *)PyCapsule_GetPointer(ptrObj, "pointer");;
+	return (Entity *)PyCapsule_GetPointer(ptrObj, "pointer");;
 }
 
 /**
@@ -103,7 +103,7 @@ static PyObject *Translate(PyObject *self, PyObject *args)
 	float x, y, z;
 	if (!PyArg_ParseTuple(args, "Offf", &ptrObj, &x, &y, &z))
 		return NULL;
-	Entity_T *entity = ObjectAsEntity(ptrObj);
+	Entity *entity = ObjectAsEntity(ptrObj);
 	entity->Translate(glm::vec3(x, y, z));
 	//printf("Translate was called.\n");
 	Py_INCREF(Py_None);
@@ -129,7 +129,7 @@ static PyObject *Rotate(PyObject *self, PyObject *args)
 	float x, y, z;
 	if (!PyArg_ParseTuple(args, "Offf", &ptrObj, &x, &y, &z))
 		return NULL;
-	Entity_T *entity = ObjectAsEntity(ptrObj);
+	Entity *entity = ObjectAsEntity(ptrObj);
 	entity->SetRotation(glm::vec3(x, y, z));
 	Py_INCREF(Py_None);
 	return Py_None;
@@ -142,7 +142,7 @@ static PyObject *Scale(PyObject *self, PyObject *args)
 	float x, y, z;
 	if (!PyArg_ParseTuple(args, "Offf", &ptrObj, &x, &y, &z))
 		return NULL;
-	Entity_T *entity = ObjectAsEntity(ptrObj);
+	Entity *entity = ObjectAsEntity(ptrObj);
 	entity->SetScale(glm::vec3(x, y, z));
 	Py_INCREF(Py_None);
 	return Py_None;
@@ -167,7 +167,7 @@ static PyObject *GetPosition(PyObject *self, PyObject *args)
 
 	if (!PyArg_ParseTuple(args, "O", &ptrObj))
 		return NULL;
-	Entity_T *entity = ObjectAsEntity(ptrObj);
+	Entity *entity = ObjectAsEntity(ptrObj);
 	pos = entity->Position();
 	PyObject *object = Py_BuildValue("(fff)", pos.x, pos.y, pos.z);
 	return object;
@@ -192,7 +192,7 @@ static PyObject *GetRotation(PyObject *self, PyObject *args)
 
 	if (!PyArg_ParseTuple(args, "O", &ptrObj))
 		return NULL;
-	Entity_T *entity = ObjectAsEntity(ptrObj);
+	Entity *entity = ObjectAsEntity(ptrObj);
 	rot = entity->Rotation();
 	PyObject *object = Py_BuildValue("(fff)", rot.x, rot.y, rot.z);
 	return object;
@@ -217,7 +217,7 @@ static PyObject *GetScale(PyObject *self, PyObject *args)
 
 	if (!PyArg_ParseTuple(args, "O", &ptrObj))
 		return NULL;
-	Entity_T *entity = ObjectAsEntity(ptrObj);
+	Entity *entity = ObjectAsEntity(ptrObj);
 	scl = entity->Scale();
 	PyObject *object = Py_BuildValue("(fff)", scl.x, scl.y, scl.z);
 	return object;
