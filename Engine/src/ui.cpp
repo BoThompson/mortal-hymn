@@ -1,12 +1,14 @@
-#include <GL\glew.h>
-#include <glm\glm.hpp>
-#include <SFML\Graphics.hpp>
 #include "game.h"
 
 
 extern GLuint vbo;
 extern GLuint UVbo;
 extern Game *game;
+
+UI::UI()
+{
+
+}
 void UI::Update()
 {
 	glm::vec2 gl_position;
@@ -17,10 +19,10 @@ void UI::Update()
 
 	if (m_step < m_sprite->GetAnimationLength(m_currentAnimation))
 	{
-		gl_position.x = (position.x / game->Screen().x) * 2 - 1;
-		gl_position.y = -((position.y / game->Screen().y) * 2 - 1);
-		gl_size.x = (size.x / game->Screen().x) * 2 - 1;
-		gl_size.y = (size.y / game->Screen().y) * 2 - 1;
+		gl_position.x = (m_position.x / game->Screen().x) * 2 - 1;
+		gl_position.y = -((m_position.y / game->Screen().y) * 2 - 1);
+		gl_size.x = (m_size.x / game->Screen().x) * 2 - 1;
+		gl_size.y = (m_size.y / game->Screen().y) * 2 - 1;
 
 		glm::vec4 rect = m_sprite->GetFrame(m_currentAnimation, m_step);
 		//Texture coordinates

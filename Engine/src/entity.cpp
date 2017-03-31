@@ -59,11 +59,13 @@ void Entity::SetUVs(std::vector<glm::vec2> UVs)
 
 void Entity::Draw(Shader &shader, glm::mat4 MVP)
 {
+	if (!m_vertices.size())
+		return;
 	glUseProgram(shader.GetProgramID());
 	glm::mat4 modelMatrix = glm::eulerAngleXYZ(m_rotation.x, m_rotation.y, m_rotation.z)
 		* glm::translate(glm::mat4(1), m_position)
 		* glm::scale(glm::mat4(1), m_scale);
-	MVP = MVP * modelMatrix;
+	//MVP  =modelMatrix * MVP;
 	glUniformMatrix4fv(shader.Uniform("MVP"), 1, GL_FALSE, &MVP[0][0]);
 	if (m_texture != NULL)
 		sf::Texture::bind(m_texture);

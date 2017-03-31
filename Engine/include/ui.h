@@ -13,16 +13,16 @@
  */
 class UI
 {
+protected:
 	Sprite *m_sprite;   /**< The sprite */
 	std::string m_name; /**< The name */
 	std::string m_currentAnimation; /**< The current animation */
 	int m_step; /**< Amount to increment by */
 	int m_timeRemaining;	/**< The time remaining */
 	glm::vec2 m_position;   /**< The position */
-	std::vector<glm::vec3> m_vertices;	/**< The vertices */
-	std::vector<glm::vec3> m_uvs; /**< The uvs */
-	glm::vec2 position; /**< Position in pixels from UL */
-	glm::vec2 size; /**< Size in pixels */
+	std::vector<glm::vec2> m_vertices;	/**< The vertices */
+	std::vector<glm::vec2> m_uvs; /**< The uvs */
+	glm::vec2 m_size; /**< Size in pixels */
 public:
 
 	/**

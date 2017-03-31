@@ -69,7 +69,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Projects\mortal-hymn\Engine\include;C:\Libraries\SFML-2.4.2\include;C:\Users\Aimle\AppData\Local\Programs\Python\Python36-32\include;C:\Libraries\glew-2.0.0\include;C:\Libraries\glm;$(PYTHON)\python36-32\include;C:\Libraries\SFML-2.4.1\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Libraries\json-develop\src;C:\Projects\mortal-hymn\Engine\include;C:\Libraries\SFML-2.4.2\include;C:\Users\Aimle\AppData\Local\Programs\Python\Python36-32\include;C:\Libraries\glew-2.0.0\include;C:\Libraries\glm;$(PYTHON)\python36-32\include;C:\Libraries\SFML-2.4.1\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\Aimle\AppData\Local\Programs\Python\Python36-32\libs;$(PYTHON)\python36-32\libs;C:\Libraries\glew-2.0.0\lib\Release\Win32;C:\Libraries\SFML-2.4.2\lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)</OutDir>
     <TargetName>$(ProjectName)_d</TargetName>
@@ -145,6 +145,7 @@
     <ClCompile Include="src\actor.cpp" />
     <ClCompile Include="src\entity.cpp" />
     <ClCompile Include="src\game.cpp" />
+    <ClCompile Include="src\healthbar.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\scripts.cpp" />
     <ClCompile Include="src\shader.cpp" />
@@ -155,6 +156,7 @@
     <ClInclude Include="include\actor.h" />
     <ClInclude Include="include\entity.h" />
     <ClInclude Include="include\game.h" />
+    <ClInclude Include="include\healthbar.h" />
     <ClInclude Include="include\scripts.h" />
     <ClInclude Include="include\shader.h" />
     <ClInclude Include="include\sprite.h" />

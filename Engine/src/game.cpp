@@ -16,6 +16,8 @@
 /**************************************************************************************************/
 #define SCREEN_WIDTH 1600.0f
 #define SCREEN_HEIGHT 1200.0f
+
+
 /**************************************************************************************************
  * TEST CODE
 /**************************************************************************************************/
@@ -71,7 +73,7 @@ void Game::Startup()
 	m_contextSettings.antialiasingLevel = 4;
 	m_contextSettings.majorVersion = 4;
 	m_contextSettings.minorVersion = 3;
-	sf::Window window(sf::VideoMode(SCREEN_HEIGHT, SCREEN_WIDTH), "Mortal Hymn", sf::Style::Default, m_contextSettings);
+	m_window.create(sf::VideoMode(SCREEN_WIDTH,SCREEN_HEIGHT), "Mortal Hymn", sf::Style::Default, m_contextSettings);
 	m_entities.resize(STARTING_MAX_ENTITIES);
 	memset(&m_entities[0], 0, sizeof(Entity) * STARTING_MAX_ENTITIES);
 	if ((err = glewInit()) != GLEW_OK)
@@ -94,6 +96,7 @@ void Game::Startup()
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	Entity *e = NewEntity();
 	e->SetVertices(points);
+	std::vector<glm::vec3> v = e->Vertices();
 	glBufferData(GL_ARRAY_BUFFER, e->Vertices().size() * sizeof(glm::vec3), &e->Vertices()[0][0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, m_UVbo);
 	e->SetUVs(UVs);
@@ -106,8 +109,10 @@ void Game::Startup()
 	texPic.loadFromImage(imagePic);
 	setup_python();
 	Actor *test_machine = new Actor(e, "testFSM");
-	m_currentShader = LoadShader("Default", "uv.frag", "uv.vert");
-
+	m_currentShader = LoadShader("Default", "uv.vert", "uv.frag");
+	json dict = LoadDictionary("data/test.def");
+	printf("%s\n", dict.dump().c_str());
+	return;
 }
 /**************************************************************************************************/
 void Game::Input()
@@ -154,7 +159,9 @@ void Game::Draw()
 	m_viewMatrix = glm::lookAt(glm::vec3(m_cameraPosition), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 	m_MVP = m_projectionMatrix * m_viewMatrix;
 	for (std::vector<Entity>::iterator it = m_entities.begin(); it != m_entities.end(); it++)
-		it->Draw(*m_currentShader, m_MVP);
+		if(it->InUse())
+			it->Draw(*m_currentShader, m_MVP);
+	m_window.display();
 }
 /**************************************************************************************************/
 void Game::Update()
@@ -212,6 +219,23 @@ Shader *Game::LoadShader(std::string name,
 		printf("Error: Game::LoadShader failed to load a valid shader.\n");
 		return NULL;
 	}
+}
+/**************************************************************************************************/
+json Game::LoadDictionary(std::string filename)
+{
+	static std::vector<char> dict_string;
+	json dict;
+	FILE *fp;
+	fp = fopen(filename.c_str(), "r");
+	fseek(fp, 0, SEEK_END);
+	long size = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+	if (dict_string.size() < size)
+		dict_string.resize(size+1);
+	fread(&dict_string[0], size, 1, fp);
+	fclose(fp);
+	dict_string[size] = '\0';
+    return json::parse(&dict_string[0]);
 }
 /**************************************************************************************************/
 Shader *Game::GetShader(std::string name)

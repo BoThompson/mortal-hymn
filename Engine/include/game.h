@@ -5,10 +5,17 @@
  * @brief	Declares the game class.
  **************************************************************************************************/
 #pragma once
+#include <json.hpp>
+#include <gl\glew.h>
+#include <glm\glm.hpp>
+#include <SFML\graphics.hpp>
+#include <vector>
+#include <array>
 #include "entity.h"
 #include "shader.h"
 #include "sprite.h"
 #include "ui.h"
+#include "healthbar.h"
 #include "scripts.h"
 #include "actor.h"
 
@@ -16,6 +23,7 @@
 
 #define STARTING_MAX_ENTITIES 100
 
+using json = nlohmann::json;
 /**************************************************************************************************/
 /**
  * @class	Game
@@ -303,6 +311,21 @@ public:
 	 * @return	A GLuint.
 	 **************************************************************************************************/
 	GLuint UVbo();
+
+	/**************************************************************************************************/
+	/**
+	 * @fn	json Game::LoadDictionary(std::string filename);
+	 *
+	 * @brief	Loads a JSON dictionary.
+	 *
+	 * @author	Bo Thompson
+	 * @date	3/30/2017
+	 *
+	 * @param	filename	Filename of the file.
+	 *
+	 * @return	The dictionary.
+	 **************************************************************************************************/
+	json Game::LoadDictionary(std::string filename);
 };
 
 extern Game *game;  /**< The game */
