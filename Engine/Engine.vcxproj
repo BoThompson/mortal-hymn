@@ -69,8 +69,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Libraries\json-develop\src;C:\Projects\mortal-hymn\Engine\include;C:\Libraries\SFML-2.4.2\include;C:\Users\Aimle\AppData\Local\Programs\Python\Python36-32\include;C:\Libraries\glew-2.0.0\include;C:\Libraries\glm;$(PYTHON)\python36-32\include;C:\Libraries\SFML-2.4.1\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Aimle\AppData\Local\Programs\Python\Python36-32\libs;$(PYTHON)\python36-32\libs;C:\Libraries\glew-2.0.0\lib\Release\Win32;C:\Libraries\SFML-2.4.2\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Libraries\json-develop\src;C:\Projects\mortal-hymn\Engine\include;C:\Libraries\SFML-2.4.2\include;C:\Users\Aimle\AppData\Local\Programs\Python\Python36-32\include;C:\Libraries\glew-2.0.0\include;C:\Libraries\glm;$(PYTHON)\python36-32\include;C:\Libraries\SFML-2.4.1\include;C:\Libraries\Assimp\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Aimle\AppData\Local\Programs\Python\Python36-32\libs;$(PYTHON)\python36-32\libs;C:\Libraries\glew-2.0.0\lib\Release\Win32;C:\Libraries\SFML-2.4.2\lib;C:\Libraries\Assimp\lib\x86;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)</OutDir>
     <TargetName>$(ProjectName)_d</TargetName>
   </PropertyGroup>
@@ -95,7 +95,7 @@
       <PreprocessorDefinitions>GLEW_STATIC;SFML_STATIC;_MBCS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>python3.lib;python36.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;glew32s.lib;sfml-graphics-s-d.lib;sfml-window-s-d.lib;sfml-system-s-d.lib;opengl32.lib;freetype.lib;jpeg.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp.lib;python3.lib;python36.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;glew32s.lib;sfml-graphics-s-d.lib;sfml-window-s-d.lib;sfml-system-s-d.lib;opengl32.lib;freetype.lib;jpeg.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -147,22 +147,31 @@
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\healthbar.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\mesh.cpp" />
+    <ClCompile Include="src\model.cpp" />
     <ClCompile Include="src\scripts.cpp" />
     <ClCompile Include="src\shader.cpp" />
     <ClCompile Include="src\sprite.cpp" />
+    <ClCompile Include="src\texture.cpp" />
     <ClCompile Include="src\ui.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\actor.h" />
+    <ClInclude Include="include\animation.h" />
     <ClInclude Include="include\entity.h" />
     <ClInclude Include="include\game.h" />
     <ClInclude Include="include\healthbar.h" />
+    <ClInclude Include="include\mesh.h" />
+    <ClInclude Include="include\model.h" />
     <ClInclude Include="include\scripts.h" />
     <ClInclude Include="include\shader.h" />
     <ClInclude Include="include\sprite.h" />
+    <ClInclude Include="include\texture.h" />
     <ClInclude Include="include\ui.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\Mortal Hymn\data\cube.def" />
+    <None Include="..\Mortal Hymn\data\test.def" />
     <None Include="..\Mortal Hymn\scripts\testFSM.py" />
     <None Include="..\Mortal Hymn\shaders\test.frag" />
     <None Include="..\Mortal Hymn\shaders\test.vert" />

@@ -52,15 +52,9 @@
 
 #define cd chdir
 #endif
-#include <GL/glew.h>
-#include <SFML/Graphics.hpp>
-#include <SFML/OpenGL.hpp>
-#include <glm\glm.hpp>
-#include <vector>
+
 #include "game.h"
-#include "scripts.h"
-#include "entity.h"
-#include "actor.h"
+
 
 
 /** The cwd path[ 4096]. */
@@ -99,7 +93,6 @@ static Entity *ObjectAsEntity(PyObject *ptrObj)
 static PyObject *Translate(PyObject *self, PyObject *args)
 {
 	PyObject *ptrObj;
-	int sts;
 	float x, y, z;
 	if (!PyArg_ParseTuple(args, "Offf", &ptrObj, &x, &y, &z))
 		return NULL;
@@ -125,7 +118,6 @@ static PyObject *Translate(PyObject *self, PyObject *args)
 static PyObject *Rotate(PyObject *self, PyObject *args)
 {
 	PyObject *ptrObj;
-	int sts;
 	float x, y, z;
 	if (!PyArg_ParseTuple(args, "Offf", &ptrObj, &x, &y, &z))
 		return NULL;
@@ -138,7 +130,6 @@ static PyObject *Rotate(PyObject *self, PyObject *args)
 static PyObject *Scale(PyObject *self, PyObject *args)
 {
 	PyObject *ptrObj;
-	int sts;
 	float x, y, z;
 	if (!PyArg_ParseTuple(args, "Offf", &ptrObj, &x, &y, &z))
 		return NULL;
@@ -353,12 +344,12 @@ void shutdown_python()
  * @return Null if it fails, else the python.
  */
 
-PyObject *load_module(const char * const module_name)
+PyObject *loadPyModule(const char * const module_name)
 {
 
 	PyObject *pModule;
 	
-	if ((pModule = FSManager::Instance().modules[module_name]) != NULL)
+	if ((pModule = game->GetPyModule(module_name)) != NULL)
 		return pModule;
 
 	// Load the module object
@@ -367,59 +358,47 @@ PyObject *load_module(const char * const module_name)
 		PyErr_Print();
 		return NULL;
 	}
-	FSManager::Instance().modules[module_name] = pModule;
-	//// pDict is a borrowed reference 
-	//pDict = PyModule_GetDict(pModule);
-	//PyErr_Print();
-	//// pFunc is also a borrowed reference 
-	//pFunc = PyDict_GetItemString(pDict, "testfun");
-
-	//if (PyCallable_Check(pFunc))
-	//{
-	//	PyObject_CallObject(pFunc, NULL);
-	//}
-	//else
-	//{
-	//	PyErr_Print();
-	//}
-
+	game->AddPyModule(module_name, pModule);
 	
 	return pModule;
 }
 
+/**************************************************************************************************/
 /**
- * Creates a new fsm.
+ * @fn	PyObject *NewAI(const char* const fsmName)
  *
- * @author Ulysee "Bo" Thompson
- * @date 2/27/2017
+ * @brief	Creates a new AI from a PyModule
  *
- * @param fsmName Name of the fsm.
+ * @author	Ulysee "Bo" Thompson
+ * @date	2/27/2017
  *
- * @return Null if it fails, else a pointer to a PyObject.
- */
-
-PyObject *NewFSM(const char* const fsmName)
+ * @param	fsmName	Name of the fsm.
+ *
+ * @return	Null if it fails, else a pointer to a PyObject.
+ **************************************************************************************************/
+PyObject *NewAI(const char* const pyName)
 {
-	if (fsmName == NULL || strlen(fsmName) == 0)
+	 PyObject *module;
+	if (pyName == NULL || strlen(pyName) == 0)
 	{
-		printf("Error(NewFSM): fsm Name is not valid.\n");
+		printf("Error(NewAI): py Name is not valid.\n");
 		return NULL;
 	}
 
-	if (FSManager::Instance().modules[fsmName] == NULL)
+	if ((module = game->GetPyModule(pyName)) == NULL)
 	{
-		printf("Error(NewFSM): module %s is not loaded.\n", fsmName);
+		printf("Error(NewAI): module %s is not loaded.\n", pyName);
 		return NULL;
 	}
 
-	PyObject *clss = PyObject_GetAttrString(FSManager::Instance().modules[fsmName], fsmName);
+	PyObject *clss = PyObject_GetAttrString(module, pyName);
 	if (clss == NULL)
 	{
-		printf("Error(NewFSM): module does not contain class %s\n.", fsmName);
+		printf("Error(NewAI): module does not contain class %s\n.", pyName);
 		return NULL;
 	}
-	PyObject *fsm = PyObject_CallMethod(FSManager::Instance().modules[fsmName], fsmName, "");
-	return fsm;
+	PyObject *ai = PyObject_CallMethod(module, pyName, "");
+	return ai;
 
 }
 

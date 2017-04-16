@@ -14,7 +14,7 @@
 
 int setup_python();
 void shutdown_python();
-PyObject *load_module(const char * const module_name);
-PyObject *NewFSM(const char *const fsm_name);
+PyObject *loadPyModule(const char * const module_name);
+PyObject *NewAI(const char *const fsm_name);
 
 #endif

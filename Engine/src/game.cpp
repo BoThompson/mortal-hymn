@@ -4,14 +4,6 @@
  *
  * Implements the game class.
  ***************************************************************************************************/
-#include <GL/glew.h>
-#include <SFML/Graphics.hpp>
-#include <SFML/OpenGL.hpp>
-#include <SFML/Graphics/Texture.hpp>
-#include <glm/glm.hpp>
-#include <glm/gtx/transform.hpp>
-#include "shader.h"
-#include "entity.h"
 #include "game.h"
 /**************************************************************************************************/
 #define SCREEN_WIDTH 1600.0f
@@ -73,7 +65,7 @@ void Game::Startup()
 	m_contextSettings.antialiasingLevel = 4;
 	m_contextSettings.majorVersion = 4;
 	m_contextSettings.minorVersion = 3;
-	m_window.create(sf::VideoMode(SCREEN_WIDTH,SCREEN_HEIGHT), "Mortal Hymn", sf::Style::Default, m_contextSettings);
+	m_window.create(sf::VideoMode((unsigned int)SCREEN_WIDTH, (unsigned int)SCREEN_HEIGHT), "Mortal Hymn", sf::Style::Default, m_contextSettings);
 	m_entities.resize(STARTING_MAX_ENTITIES);
 	memset(&m_entities[0], 0, sizeof(Entity) * STARTING_MAX_ENTITIES);
 	if ((err = glewInit()) != GLEW_OK)
@@ -85,7 +77,7 @@ void Game::Startup()
 
 	//m_modelMatrix = glm::mat4(1.0);
 	m_viewMatrix = glm::mat4(1.0);
-	m_cameraPosition = glm::vec3(0, 0, 1);
+	m_cameraPosition = glm::vec3(0, 0, 10);
 	m_cameraRotation = glm::vec3(0, 0, 0);
 	m_projectionMatrix = glm::perspective(glm::radians(35.0f), 
 							SCREEN_HEIGHT / SCREEN_WIDTH, 1.0f, 100.0f);
@@ -94,13 +86,13 @@ void Game::Startup()
 	glGenBuffers(1, &m_vbo);
 	glGenBuffers(1, &m_UVbo);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	Entity *e = NewEntity();
-	e->SetVertices(points);
-	std::vector<glm::vec3> v = e->Vertices();
-	glBufferData(GL_ARRAY_BUFFER, e->Vertices().size() * sizeof(glm::vec3), &e->Vertices()[0][0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, m_UVbo);
-	e->SetUVs(UVs);
-	glBufferData(GL_ARRAY_BUFFER, e->UVs().size() * sizeof(glm::vec2), &e->UVs()[0][0], GL_STATIC_DRAW);
+	Entity *e;// = NewEntity();
+	//e->SetVertices(points);
+	//std::vector<glm::vec3> v = e->Vertices();
+	//glBufferData(GL_ARRAY_BUFFER, e->Vertices().size() * sizeof(glm::vec3), &e->Vertices()[0][0], GL_STATIC_DRAW);
+	//glBindBuffer(GL_ARRAY_BUFFER, m_UVbo);
+	//e->SetUVs(UVs);
+	//glBufferData(GL_ARRAY_BUFFER, e->UVs().size() * sizeof(glm::vec2), &e->UVs()[0][0], GL_STATIC_DRAW);
 	m_lastUpdateTime = m_clock.getElapsedTime();
 	sf::Texture texPic;
 	sf::Image imagePic;
@@ -108,9 +100,11 @@ void Game::Startup()
 	imagePic.flipVertically();
 	texPic.loadFromImage(imagePic);
 	setup_python();
-	Actor *test_machine = new Actor(e, "testFSM");
 	m_currentShader = LoadShader("Default", "uv.vert", "uv.frag");
 	json dict = LoadDictionary("data/test.def");
+	e = NewEntity();
+	e->LoadFromDict(dict);
+	//e->Translate(glm::vec3(0, 0, 10));
 	printf("%s\n", dict.dump().c_str());
 	return;
 }
@@ -156,7 +150,7 @@ void Game::Input()
 void Game::Draw()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	m_viewMatrix = glm::lookAt(glm::vec3(m_cameraPosition), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	m_viewMatrix = glm::lookAt(m_cameraPosition, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 	m_MVP = m_projectionMatrix * m_viewMatrix;
 	for (std::vector<Entity>::iterator it = m_entities.begin(); it != m_entities.end(); it++)
 		if(it->InUse())
@@ -186,17 +180,42 @@ sf::Time Game::Delta()
 	return  m_clock.getElapsedTime() - m_lastUpdateTime;
 }
 /**************************************************************************************************/
-sf::Texture *Game::LoadTexture(std::string filename)
+Model *Game::LoadModel(std::string filename)
 {
-	sf::Texture *tex;
+	Assimp::Importer importer;
+	const aiScene *scene = importer.ReadFile(filename.c_str(), aiProcess_Triangulate);
+	if (scene == NULL)
+	{
+		printf("Failure to load scene from %s.\n", filename.c_str());
+	}
+	Model *model;
+
+	if (m_models.find(filename) != m_models.end())
+	{
+		return m_models[filename];
+	}
+	else
+	{
+		model = new Model();
+		model->Load(scene);
+		m_models[filename] = model;
+		return model;
+	}
+
+}
+
+/**************************************************************************************************/
+Texture *Game::LoadTexture(std::string filename)
+{
+	Texture *tex;
 	if (m_textures.find(filename) != m_textures.end())
 	{
 		return m_textures[filename];
 	}
 	else
 	{
-		tex = new sf::Texture();
-		tex->loadFromFile(filename);
+		tex = new Texture();
+		tex->Load(filename);
 		m_textures[filename] = tex;
 		return tex;
 	}
@@ -228,7 +247,7 @@ json Game::LoadDictionary(std::string filename)
 	FILE *fp;
 	fp = fopen(filename.c_str(), "r");
 	fseek(fp, 0, SEEK_END);
-	long size = ftell(fp);
+	unsigned long size = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 	if (dict_string.size() < size)
 		dict_string.resize(size+1);
@@ -292,6 +311,38 @@ Entity *Game::NewEntity()
 	Entity *e = &m_entities[oldsize];
 	e->Initialize();
 	return e;
+}
+
+/**************************************************************************************************/
+Actor *Game::NewActor()
+{
+	int oldsize;
+	for (std::vector<Actor>::iterator it = m_actors.begin(); it != m_actors.end(); it++)
+		if (!it->InUse())
+		{
+			it->Reset();
+			return it._Ptr;
+		}
+	//Run out of room, allocate more
+	oldsize = m_actors.size();
+	m_actors.resize(m_actors.size() * 2);
+	memset(&m_actors[oldsize], 0, sizeof(Entity) * (m_actors.size() - oldsize));
+	Actor *a = &m_actors[oldsize];
+	a->Reset();
+	return a;
+}
+/**************************************************************************************************/
+PyObject *Game::GetPyModule(const char *name)
+{
+	if (m_pyModules.find(name) == m_pyModules.end())
+		return NULL;
+	else
+		return m_pyModules[name];
+}
+/**************************************************************************************************/
+void Game::AddPyModule(const char *name, PyObject *module)
+{
+	m_pyModules[name] = module;
 }
 /**************************************************************************************************/
 GLuint Game::Vbo()

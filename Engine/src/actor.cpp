@@ -1,21 +1,21 @@
+/**************************************************************************************************/
+/**
+ * @file	src\actor.cpp.
+ *
+ * @brief	Implements the actor class.
+ **************************************************************************************************/
 #include "game.h"
 
-
-/**
- * Default constructor.
- *
- * @author Ulysee "Bo" Thompson
- * @date 2/9/2017
- */
+/**************************************************************************************************/
 Actor::Actor(Entity *entity, const char *fsmName)
 {
 	PyObject *pResult;
 	m_state = -100;
 	m_timer = -100;
-	if (load_module(fsmName) == NULL)
+	if (loadPyModule(fsmName) == NULL)
 	{
 
-	}else if((m_FSM = NewFSM(fsmName)) == NULL)
+	}else if((m_pyModule = NewAI(fsmName)) == NULL)
 	{
 		printf("Error(FSM constructor): python class is null.");
 		return;
@@ -23,12 +23,12 @@ Actor::Actor(Entity *entity, const char *fsmName)
 	{
 		m_entity = entity;
 		PyObject *actor = PyCapsule_New(entity, "pointer", NULL);
-		PyObject_SetAttrString(m_FSM, "pointer", actor);
+		PyObject_SetAttrString(m_pyModule, "pointer", actor);
 
-		pResult = PyObject_CallMethod(m_FSM, "start", NULL);
+		pResult = PyObject_CallMethod(m_pyModule, "start", NULL);
 		
-		m_state = _PyLong_AsInt(PyObject_GetAttrString(m_FSM, "state"));
-		m_timer = _PyLong_AsInt(PyObject_GetAttrString(m_FSM, "timer"));
+		m_state = _PyLong_AsInt(PyObject_GetAttrString(m_pyModule, "state"));
+		m_timer = _PyLong_AsInt(PyObject_GetAttrString(m_pyModule, "timer"));
 	}
 	//else
 	//{
@@ -38,67 +38,28 @@ Actor::Actor(Entity *entity, const char *fsmName)
 	//trigger an automatic update
 }
 
-/**
- * Sets a timer.
- *
- * @author Ulysee "Bo" Thompson
- * @date 2/5/2017
- *
- * @param timer The timer.
- */
+/**************************************************************************************************/
 void Actor::SetTimer(int timer)
 {
 	m_timer = timer;
 }
-
-/**
- * Gets the timer.
- *
- * @author Ulysee "Bo" Thompson
- * @date 2/5/2017
- *
- * @return An int.
- */
+/**************************************************************************************************/
 int Actor::Timer()
 {
 	return m_timer;
 }
-
-/**
- * Sets a state.
- *
- * @author Ulysee "Bo" Thompson
- * @date 2/5/2017
- *
- * @param state The state.
- */
+/**************************************************************************************************/
 void Actor::SetState(int state)
 {
 	m_state = state;
 }
-
-/**
- * Gets the state.
- *
- * @author Ulysee "Bo" Thompson
- * @date 2/5/2017
- *
- * @return An int.
- */
+/**************************************************************************************************/
 int Actor::State()
 {
 	return m_state;
 }
 
-
-/**
- * Calls on the Finite State Machine's update method if the timer has elapsed
- *
- * @author Ulysee "Bo" Thompson
- * @date 2/5/2017
- *
- * @param delta The delta.
- */
+/**************************************************************************************************/
 void Actor::Update(int delta)
 {
 	if (m_state < 0)
@@ -107,27 +68,44 @@ void Actor::Update(int delta)
 	{
 		//Call the python FSM method
 		//Update the state
-		PyObject_CallMethod(m_FSM, "update", NULL);
-		m_state = _PyLong_AsInt(PyObject_GetAttrString(m_FSM, "state"));
-		m_timer = _PyLong_AsInt(PyObject_GetAttrString(m_FSM, "timer"));
+		PyObject_CallMethod(m_pyModule, "update", NULL);
+		m_state = _PyLong_AsInt(PyObject_GetAttrString(m_pyModule, "state"));
+		m_timer = _PyLong_AsInt(PyObject_GetAttrString(m_pyModule, "timer"));
 	}
 }
-
+/**************************************************************************************************/
 Entity *Actor::GetEntity()
 {
 	return m_entity;
 }
 
-/**
- * Sets an entity.
- *
- * @author Ulysee "Bo" Thompson
- * @date 2/20/2017
- *
- * @param [in,out] entity If non-null, the entity.
- */
-
+/**************************************************************************************************/
 void Actor::SetEntity(Entity *entity)
 {
 	m_entity = entity;
 }
+
+/**************************************************************************************************/
+void Actor::Reset()
+{
+	m_entity = 0;
+	m_inUse = true;
+	m_pyModule = NULL;
+	m_state = 0;
+	m_timer = 0;
+}
+/**************************************************************************************************/
+
+bool Actor::InUse()
+{
+	return m_inUse;
+}
+/**************************************************************************************************/
+Actor::Actor()
+{
+
+}
+/**************************************************************************************************/
+/**************************************************************************************************/
+/**************************************************************************************************/
+/**************************************************************************************************/

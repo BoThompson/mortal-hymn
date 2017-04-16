@@ -6,11 +6,28 @@
  **************************************************************************************************/
 #pragma once
 #include <json.hpp>
+using json = nlohmann::json;
+
+
 #include <gl\glew.h>
 #include <glm\glm.hpp>
+#include <glm\gtx\transform.hpp>
 #include <SFML\graphics.hpp>
+#include <SFML\OpenGL.hpp>
+#include <SFML\Graphics\Texture.hpp>
 #include <vector>
 #include <array>
+#include <assimp\Importer.hpp>
+#include <assimp\mesh.h>
+#include <assimp\scene.h>
+#include <assimp\postprocess.h>
+#include "shader.h"
+#include "texture.h"
+#include "mesh.h"
+#include "animation.h"
+#include "model.h"
+#include "entity.h"
+#include "animation.h"
 #include "entity.h"
 #include "shader.h"
 #include "sprite.h"
@@ -23,7 +40,6 @@
 
 #define STARTING_MAX_ENTITIES 100
 
-using json = nlohmann::json;
 /**************************************************************************************************/
 /**
  * @class	Game
@@ -40,8 +56,11 @@ class Game
 	bool m_ended;   /**< True if ended */
 	sf::Time m_lastUpdateTime;  /**< The last update time */
 	std::vector<Entity> m_entities; /**< The entities */
-	std::map<std::string, sf::Texture*> m_textures; /**< The textures */
+	std::map<std::string, PyObject*> m_pyModules; /**< The python modules for actors */
+	std::vector<Actor> m_actors; /**< The actors */
+	std::map<std::string, Texture*> m_textures; /**< The textures */
 	std::map<std::string, Shader*> m_shaders;   /**< The shaders */
+	std::map<std::string, Model*> m_models; /**< The models */
 	Shader *m_currentShader; /**< The current shader */
 	glm::mat4 m_modelMatrix;	/**< The model matrix */
 	glm::mat4 m_projectionMatrix;   /**< The projection matrix */
@@ -55,6 +74,21 @@ class Game
 	GLuint m_UVbo;
 
 public:
+
+	/**************************************************************************************************/
+	/**
+	 * @fn	Model *Game::LoadModel(std::string filename) sf::Time Time();
+	 *
+	 * @brief	Loads a model.
+	 *
+	 * @author	Bo Thompson
+	 * @date	4/16/2017
+	 *
+	 * @param	filename	Filename of the file.
+	 *
+	 * @return	Null if it fails, else the model.
+	 **************************************************************************************************/
+	Model *LoadModel(std::string filename);
 
 	/**************************************************************************************************/
 	/**
@@ -137,18 +171,18 @@ public:
 
 	/**************************************************************************************************/
 	/**
-	 * @fn	sf::Texture Game::*LoadTexture(std::string filename);
+	 * @fn	Texture Game::*LoadTexture(std::string filename);
 	 *
 	 * @brief	Loads a texture.
 	 *
-	 * @author	Aimle
-	 * @date	3/25/2017
+	 * @author	Bo Thompson
+	 * @date	4/16/2017
 	 *
 	 * @param	filename	Filename of the file.
 	 *
 	 * @return	Null if it fails, else the texture.
 	 **************************************************************************************************/
-	sf::Texture *LoadTexture(std::string filename);
+	Texture *LoadTexture(std::string filename);
 
 	/**************************************************************************************************/
 	/**
@@ -288,6 +322,19 @@ public:
 
 	/**************************************************************************************************/
 	/**
+	 * @fn	Actor Game::*NewActor();
+	 *
+	 * @brief	Creates a new actor.
+	 *
+	 * @author	Bo Thompson
+	 * @date	4/16/2017
+	 *
+	 * @return	Null if it fails, else a pointer to an Actor.
+	 **************************************************************************************************/
+	Actor *NewActor();
+
+	/**************************************************************************************************/
+	/**
 	 * @fn	GLuint Game::Vbo();
 	 *
 	 * @brief	Gets the vbo.
@@ -326,6 +373,35 @@ public:
 	 * @return	The dictionary.
 	 **************************************************************************************************/
 	json Game::LoadDictionary(std::string filename);
+
+	/**************************************************************************************************/
+	/**
+	 * @fn	PyObject Game::*GetPyModule(const char *name);
+	 *
+	 * @brief	Gets python module.
+	 *
+	 * @author	Bo Thompson
+	 * @date	4/16/2017
+	 *
+	 * @param	name	The name.
+	 *
+	 * @return	Null if it fails, else the py module.
+	 **************************************************************************************************/
+	PyObject *GetPyModule(const char *name);
+
+	/**************************************************************************************************/
+	/**
+	 * @fn	void Game::AddPyModule(const char *name, PyObject *module);
+	 *
+	 * @brief	Adds a py module to 'module'.
+	 *
+	 * @author	Bo Thompson
+	 * @date	4/16/2017
+	 *
+	 * @param 		  	name  	The name.
+	 * @param [in,out]	module	If non-null, the module.
+	 **************************************************************************************************/
+	void AddPyModule(const char *name, PyObject *module);
 };
 
 extern Game *game;  /**< The game */

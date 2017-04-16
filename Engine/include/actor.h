@@ -1,35 +1,176 @@
+/**************************************************************************************************/
+/**
+ * @file	include\actor.h.
+ *
+ * @brief	Declares the actor class.
+ **************************************************************************************************/
 #pragma once
+
+/**************************************************************************************************/
+/**
+ * @class	Actor actor.h include\actor.h
+ *
+ * @brief	An AI actor.
+ *
+ * @author	Bo Thompson
+ * @date	4/16/2017
+ **************************************************************************************************/
 class Actor
 {
-	
-	int m_timer;
-	int m_state;
-	PyObject *m_FSM;
+	bool m_inUse;   /**< True to in use */
+	int m_timer;	/**< The timer */
+	int m_state;	/**< The state */
+	PyObject *m_pyModule;   /**< The py module */
+
+	/**************************************************************************************************/
+	/**
+	 * @class	Entity* actor.h include\actor.h
+	 *
+	 * @brief	An entity*.
+	 *
+	 * @author	Bo Thompson
+	 * @date	4/16/2017
+	 **************************************************************************************************/
 	class Entity *m_entity;
+public:
+
+	/**************************************************************************************************/
+	/**
+	* @fn	Actor::Actor();
+	*
+	* @brief	Default constructor.
+	*
+	* @author	Bo Thompson
+	* @date	4/16/2017
+	**************************************************************************************************/
 	Actor();
-public:
+
+	/**************************************************************************************************/
+	/**
+	 * @fn	Actor::Actor(Entity *entity, const char *fsmName);
+	 *
+	 * @brief	Constructor.
+	 *
+	 * @author	Bo Thompson
+	 * @date	4/16/2017
+	 *
+	 * @param [in,out]	entity 	If non-null, the entity.
+	 * @param 		  	fsmName	Name of the fsm.
+	 **************************************************************************************************/
 	Actor(Entity *entity, const char *fsmName);
+
+	/**************************************************************************************************/
+	/**
+	 * @fn	void Actor::SetTimer(int timer);
+	 *
+	 * @brief	Sets a timer.
+	 *
+	 * @author	Bo Thompson
+	 * @date	4/16/2017
+	 *
+	 * @param	timer	The timer.
+	 **************************************************************************************************/
 	void SetTimer(int timer);
+
+	/**************************************************************************************************/
+	/**
+	 * @fn	int Actor::Timer();
+	 *
+	 * @brief	Gets the timer.
+	 *
+	 * @author	Bo Thompson
+	 * @date	4/16/2017
+	 *
+	 * @return	An int.
+	 **************************************************************************************************/
 	int Timer();
+
+	/**************************************************************************************************/
+	/**
+	 * @fn	void Actor::SetEntity(class Entity *entity);
+	 *
+	 * @brief	Sets an entity.
+	 *
+	 * @author	Bo Thompson
+	 * @date	4/16/2017
+	 *
+	 * @param [in,out]	entity	If non-null, the entity.
+	 **************************************************************************************************/
 	void SetEntity(class Entity *entity);
+
+	/**************************************************************************************************/
+	/**
+	 * @fn	Entity Actor::*GetEntity();
+	 *
+	 * @brief	Gets the entity.
+	 *
+	 * @author	Bo Thompson
+	 * @date	4/16/2017
+	 *
+	 * @return	Null if it fails, else the entity.
+	 **************************************************************************************************/
 	Entity *GetEntity();
+
+	/**************************************************************************************************/
+	/**
+	 * @fn	void Actor::SetState(int state);
+	 *
+	 * @brief	Sets a state.
+	 *
+	 * @author	Bo Thompson
+	 * @date	4/16/2017
+	 *
+	 * @param	state	The state.
+	 **************************************************************************************************/
 	void SetState(int state);
+
+	/**************************************************************************************************/
+	/**
+	 * @fn	int Actor::State();
+	 *
+	 * @brief	Gets the state.
+	 *
+	 * @author	Bo Thompson
+	 * @date	4/16/2017
+	 *
+	 * @return	An int.
+	 **************************************************************************************************/
 	int State();
+
+	/**************************************************************************************************/
+	/**
+	 * @fn	void Actor::Update(int delta);
+	 *
+	 * @brief	Updates the given delta.
+	 *
+	 * @author	Bo Thompson
+	 * @date	4/16/2017
+	 *
+	 * @param	delta	The delta.
+	 **************************************************************************************************/
 	void Update(int delta);
-};
 
-class FSManager
-{
-	FSManager() {};
-	FSManager(FSManager const&);
-	void operator=(FSManager const&);
-public:
-	static FSManager& Instance()
-	{
-		static FSManager instance;
-		return instance;
-	}
-	std::map<std::string, PyObject*> modules;
-	std::map<std::string, PyObject*> fsms;
+	/**************************************************************************************************/
+	/**
+	 * @fn	bool Actor::InUse();
+	 *
+	 * @brief	Determines if we can in use.
+	 *
+	 * @author	Bo Thompson
+	 * @date	4/16/2017
+	 *
+	 * @return	True if it succeeds, false if it fails.
+	 **************************************************************************************************/
+	bool InUse();
 
+	/**************************************************************************************************/
+	/**
+	 * @fn	void Actor::Reset();
+	 *
+	 * @brief	Resets this object.
+	 *
+	 * @author	Bo Thompson
+	 * @date	4/16/2017
+	 **************************************************************************************************/
+	void Reset();
 };

@@ -56,9 +56,24 @@ void Entity::SetUVs(std::vector<glm::vec2> UVs)
 	m_uvs = UVs;
 }
 
+void Entity::DrawModel(Shader &shader, glm::mat4 MVP)
+{
+	glUseProgram(shader.GetProgramID());
+	glm::mat4 modelMatrix = glm::eulerAngleXYZ(m_rotation.x, m_rotation.y, m_rotation.z)
+		* glm::translate(glm::mat4(1), m_position)
+		* glm::scale(glm::mat4(1), m_scale);
+	glUniformMatrix4fv(shader.Uniform("MVP"), 1, GL_FALSE, &MVP[0][0]);
+	m_model->Draw();
+	glUseProgram(0);
+}
 
 void Entity::Draw(Shader &shader, glm::mat4 MVP)
 {
+	if (m_model)
+	{
+		DrawModel(shader, MVP);
+		return;
+	}
 	if (!m_vertices.size())
 		return;
 	glUseProgram(shader.GetProgramID());
@@ -145,4 +160,25 @@ void Entity::Initialize()
 bool Entity::InUse()
 {
 	return m_inUse;
+}
+
+void Entity::AddActor(const char *moduleName)
+{
+	
+}
+
+void Entity::LoadFromDict(json dict)
+{
+	if (dict["entity"])
+	{
+		if (dict.find("model") != dict.end())
+			m_model = game->LoadModel(dict["model"]);
+		if (dict.find("actor") != dict.end())
+			m_actor = new Actor(this, dict["actor"].get<std::string>().c_str());
+	}
+	else
+	{
+		printf("LoadFromDict(Error): Failed, no entity key found.\n");
+	}
+
 }

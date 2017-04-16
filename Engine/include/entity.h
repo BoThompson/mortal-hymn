@@ -26,6 +26,7 @@ class Entity
 	sf::Texture *m_texture;  /**< The texture */
 	class Actor *m_actor; /**< The actor object for this entity*/
 public:
+	Model *m_model;
 
 	/**************************************************************************************************/
 	/**
@@ -129,6 +130,20 @@ public:
 	 * @param 		  	MVP   	The mvp.
 	 **************************************************************************************************/
 	void Draw(class Shader &shader, glm::mat4 MVP);
+
+	/**************************************************************************************************/
+	/**
+	 * @fn	void Entity::DrawModel(class Shader &shader, glm::mat4 MVP);
+	 *
+	 * @brief	Draw model.
+	 *
+	 * @author	Bo Thompson
+	 * @date	4/16/2017
+	 *
+	 * @param [in,out]	shader	The shader.
+	 * @param 		  	MVP   	The mvp.
+	 **************************************************************************************************/
+	void DrawModel(class Shader &shader, glm::mat4 MVP);
 
 	/**************************************************************************************************/
 	/**
@@ -242,4 +257,30 @@ public:
 	 * @return	True if it succeeds, false if it fails.
 	 **************************************************************************************************/
 	bool InUse();
+
+	/**************************************************************************************************/
+	/**
+	 * @fn	void Entity::AddActor(const char *moduleName);
+	 *
+	 * @brief	Adds an actor.
+	 *
+	 * @author	Bo Thompson
+	 * @date	4/16/2017
+	 *
+	 * @param	moduleName	Name of the module.
+	 **************************************************************************************************/
+	void AddActor(const char *moduleName);
+
+	/**************************************************************************************************/
+	/**
+	 * @fn	void Entity::LoadFromDict(json dict);
+	 *
+	 * @brief	Loads from dictionary.
+	 *
+	 * @author	Bo Thompson
+	 * @date	4/16/2017
+	 *
+	 * @param	dict	The dictionary.
+	 **************************************************************************************************/
+	void LoadFromDict(nlohmann::json dict);
 };

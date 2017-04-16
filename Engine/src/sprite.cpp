@@ -27,14 +27,15 @@ glm::vec4 Sprite::GetFrame(std::string animation, int step)
 
 glm::vec4 Sprite::GetFrame(int index)
 {
-	glm::vec2 frameCoords;
+	int frameY;
+	int frameX;
 	glm::vec4 frameRect;
-	frameCoords.y = (int)(index / m_framesPerTexture.x);
-	frameCoords.x = index % (int)m_framesPerTexture.y;
-	frameRect.x = frameCoords.x * m_frameSize.x;
-	frameRect.y = frameCoords.y * m_frameSize.y;
-	frameRect.z = frameCoords.x * (m_frameSize.x + 1);
-	frameRect.w = frameCoords.y * (m_frameSize.y + 1);
+	frameY = int(index / m_framesPerTexture.x);
+	frameX = index % (int)m_framesPerTexture.y;
+	frameRect.x = frameX * m_frameSize.x;
+	frameRect.y = frameY * m_frameSize.y;
+	frameRect.z = frameX * (m_frameSize.x + 1);
+	frameRect.w = frameY * (m_frameSize.y + 1);
 	return frameRect;
 }
 
