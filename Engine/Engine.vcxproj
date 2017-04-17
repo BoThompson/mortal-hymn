@@ -69,7 +69,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Libraries\json-develop\src;C:\Projects\mortal-hymn\Engine\include;C:\Libraries\SFML-2.4.2\include;C:\Users\Aimle\AppData\Local\Programs\Python\Python36-32\include;C:\Libraries\glew-2.0.0\include;C:\Libraries\glm;$(PYTHON)\python36-32\include;C:\Libraries\SFML-2.4.1\include;C:\Libraries\Assimp\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Libraries\bullet3-2.86.1\bullet3-2.86.1\src;C:\Libraries\json-develop\src;C:\Libraries\SFML-2.4.2\include;C:\Users\Aimle\AppData\Local\Programs\Python\Python36-32\include;C:\Libraries\glew-2.0.0\include;C:\Libraries\glm;$(PYTHON)\python36-32\include;C:\Libraries\SFML-2.4.1\include;C:\Libraries\Assimp\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\Aimle\AppData\Local\Programs\Python\Python36-32\libs;$(PYTHON)\python36-32\libs;C:\Libraries\glew-2.0.0\lib\Release\Win32;C:\Libraries\SFML-2.4.2\lib;C:\Libraries\Assimp\lib\x86;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)</OutDir>
     <TargetName>$(ProjectName)_d</TargetName>
@@ -93,6 +93,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>GLEW_STATIC;SFML_STATIC;_MBCS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Projects\mortal-hymn\Engine\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>assimp.lib;python3.lib;python36.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;glew32s.lib;sfml-graphics-s-d.lib;sfml-window-s-d.lib;sfml-system-s-d.lib;opengl32.lib;freetype.lib;jpeg.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -177,6 +178,17 @@
     <None Include="..\Mortal Hymn\shaders\test.vert" />
     <None Include="..\Mortal Hymn\shaders\uv.frag" />
     <None Include="..\Mortal Hymn\shaders\uv.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Libraries\bullet3-2.86.1\bullet3-2.86.1\build\src\BulletCollision\BulletCollision.vcxproj">
+      <Project>{f70e5fd8-7fdf-3eff-8af1-e14ff52f9742}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\bullet3-2.86.1\bullet3-2.86.1\build\src\BulletDynamics\BulletDynamics.vcxproj">
+      <Project>{4e3c5b9b-0ac5-3659-a3b2-487b63b78487}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\bullet3-2.86.1\bullet3-2.86.1\build\src\LinearMath\LinearMath.vcxproj">
+      <Project>{10066b0c-a1cd-39ee-ac53-b9c30d1b0f2d}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -26,7 +26,7 @@ Entity::Entity()
 	m_texture = NULL;
 }
 
-void Entity::SetTexture(sf::Texture *texture)
+void Entity::SetTexture(Texture *texture)
 {
 	m_texture = texture;
 }
@@ -59,11 +59,9 @@ void Entity::SetUVs(std::vector<glm::vec2> UVs)
 void Entity::DrawModel(Shader &shader, glm::mat4 MVP)
 {
 	glUseProgram(shader.GetProgramID());
-	glm::mat4 modelMatrix = glm::eulerAngleXYZ(m_rotation.x, m_rotation.y, m_rotation.z)
-		* glm::translate(glm::mat4(1), m_position)
-		* glm::scale(glm::mat4(1), m_scale);
-	glUniformMatrix4fv(shader.Uniform("MVP"), 1, GL_FALSE, &MVP[0][0]);
-	m_model->Draw();
+	glm::mat4 modelMatrix = (glm::translate(glm::mat4(1), m_position) * glm::eulerAngleXYZ(m_rotation.x, m_rotation.y, m_rotation.z));
+	glUniformMatrix4fv(shader.Uniform("MVP"), 1, GL_FALSE, &modelMatrix[0][0]);
+	m_model->Draw(shader, modelMatrix);
 	glUseProgram(0);
 }
 
@@ -83,7 +81,7 @@ void Entity::Draw(Shader &shader, glm::mat4 MVP)
 	//MVP  =modelMatrix * MVP;
 	glUniformMatrix4fv(shader.Uniform("MVP"), 1, GL_FALSE, &MVP[0][0]);
 	if (m_texture != NULL)
-		sf::Texture::bind(m_texture);
+		m_texture->Bind();
 		
 	glEnableVertexAttribArray(0);
 	//glEnableVertexAttribArray(2);
@@ -99,8 +97,7 @@ void Entity::Draw(Shader &shader, glm::mat4 MVP)
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
-	if (m_texture != NULL)
-		sf::Texture::bind(NULL);
+	m_texture->Unbind();
 }
 
 

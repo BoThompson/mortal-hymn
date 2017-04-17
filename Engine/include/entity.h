@@ -23,7 +23,7 @@ class Entity
 	glm::vec3 m_position;	/**< The position */
 	glm::vec3 m_rotation;	/**< The rotation */
 	glm::vec3 m_scale;   /**< The scale */
-	sf::Texture *m_texture;  /**< The texture */
+	Texture *m_texture;  /**< The texture */
 	class Actor *m_actor; /**< The actor object for this entity*/
 public:
 	Model *m_model;
@@ -102,7 +102,7 @@ public:
 	 *
 	 * @param [in,out]	texture	If non-null, the texture.
 	 **************************************************************************************************/
-	void SetTexture(sf::Texture *texture);
+	void SetTexture(Texture *texture);
 
 	/**************************************************************************************************/
 	/**
@@ -115,7 +115,7 @@ public:
 	 *
 	 * @param	v	The glm::vec3 to process.
 	 **************************************************************************************************/
-	void Translate(glm::vec3 v);
+	void Translate(glm::vec3 vector);
 
 	/**************************************************************************************************/
 	/**
