@@ -24,15 +24,15 @@ void Model::Load(const aiScene *scene)
 	}
 }
 
-void Model::Draw()
+void Model::Draw(Shader &shader, glm::mat4 modelMatrix)
 {
+	int texChannel = 0;
 	for (std::vector<Texture*>::iterator i = m_textures.begin(); i != m_textures.end(); i++)
 	{
-		(*i)->Bind();
+		(*i)->Bind(texChannel++);
 	}
-
 	for (std::vector<Mesh>::iterator i = m_meshes.begin(); i != m_meshes.end(); i++)
 	{
-		i->Draw();
+		i->Draw(shader, modelMatrix);
 	}
 }

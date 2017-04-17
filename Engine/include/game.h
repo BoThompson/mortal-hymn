@@ -9,6 +9,8 @@
 using json = nlohmann::json;
 
 
+#include <btBulletDynamicsCommon.h>
+#include <btBulletCollisionCommon.h>
 #include <gl\glew.h>
 #include <glm\glm.hpp>
 #include <glm\gtx\transform.hpp>
@@ -402,6 +404,32 @@ public:
 	 * @param [in,out]	module	If non-null, the module.
 	 **************************************************************************************************/
 	void AddPyModule(const char *name, PyObject *module);
+
+	/**************************************************************************************************/
+	/**
+	 * @fn	glm::mat4 Game::GetViewMatrix();
+	 *
+	 * @brief	Gets view matrix.
+	 *
+	 * @author	Bo Thompson
+	 * @date	4/16/2017
+	 *
+	 * @return	The view matrix.
+	 **************************************************************************************************/
+	glm::mat4 GetViewMatrix();
+
+	/**************************************************************************************************/
+	/**
+	 * @fn	glm::mat4 Game::GetProjectionMatrix();
+	 *
+	 * @brief	Gets projection matrix.
+	 *
+	 * @author	Bo Thompson
+	 * @date	4/16/2017
+	 *
+	 * @return	The projection matrix.
+	 **************************************************************************************************/
+	glm::mat4 GetProjectionMatrix();
 };
 
 extern Game *game;  /**< The game */

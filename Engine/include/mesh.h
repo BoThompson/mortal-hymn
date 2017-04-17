@@ -23,6 +23,7 @@ class Mesh
 {
 	GLuint m_vao;
 	GLuint m_tris;
+	glm::mat4 m_transformMatrix;
 	std::array<GLuint, 4> m_vbo;
 	std::vector<Bone> m_bones;
 	std::vector<glm::vec3> m_vertices;
@@ -32,5 +33,5 @@ class Mesh
 public:
 	~Mesh();
 	void Initialize(aiMesh *mesh);
-	void Draw();
+	void Draw(Shader &shader, glm::mat4 modelMatrix);
 };

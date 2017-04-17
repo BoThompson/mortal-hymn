@@ -55,6 +55,8 @@ Game::Game()
 {
 
 }
+Entity *e;// = NewEntity();
+
 /**************************************************************************************************/
 void Game::Startup()
 {
@@ -80,13 +82,12 @@ void Game::Startup()
 	m_cameraPosition = glm::vec3(0, 0, 10);
 	m_cameraRotation = glm::vec3(0, 0, 0);
 	m_projectionMatrix = glm::perspective(glm::radians(35.0f), 
-							SCREEN_HEIGHT / SCREEN_WIDTH, 1.0f, 100.0f);
+							SCREEN_WIDTH / SCREEN_HEIGHT, 1.0f, 100.0f);
 	glEnable(GL_DEPTH_TEST); // enable depth-testing
 	glDepthFunc(GL_LESS); // depth-testing interprets a smaller value as "closer"
 	glGenBuffers(1, &m_vbo);
 	glGenBuffers(1, &m_UVbo);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	Entity *e;// = NewEntity();
 	//e->SetVertices(points);
 	//std::vector<glm::vec3> v = e->Vertices();
 	//glBufferData(GL_ARRAY_BUFFER, e->Vertices().size() * sizeof(glm::vec3), &e->Vertices()[0][0], GL_STATIC_DRAW);
@@ -94,17 +95,13 @@ void Game::Startup()
 	//e->SetUVs(UVs);
 	//glBufferData(GL_ARRAY_BUFFER, e->UVs().size() * sizeof(glm::vec2), &e->UVs()[0][0], GL_STATIC_DRAW);
 	m_lastUpdateTime = m_clock.getElapsedTime();
-	sf::Texture texPic;
-	sf::Image imagePic;
-	imagePic.loadFromFile("images\\test.png");
-	imagePic.flipVertically();
-	texPic.loadFromImage(imagePic);
 	setup_python();
 	m_currentShader = LoadShader("Default", "uv.vert", "uv.frag");
 	json dict = LoadDictionary("data/test.def");
 	e = NewEntity();
 	e->LoadFromDict(dict);
-	//e->Translate(glm::vec3(0, 0, 10));
+	e->Translate(glm::vec3(0, 0, -90));
+	//e->SetRotation(glm::vec3(90, 0, 0));
 	printf("%s\n", dict.dump().c_str());
 	return;
 }
@@ -354,4 +351,17 @@ GLuint Game::UVbo()
  {
 	 return m_UVbo;
  }
+/**************************************************************************************************/
+glm::mat4 Game::GetViewMatrix()
+{
+	return m_viewMatrix;
+}
+/**************************************************************************************************/
+glm::mat4 Game::GetProjectionMatrix()
+{
+	return m_projectionMatrix;
+}
+/**************************************************************************************************/
+/**************************************************************************************************/
+/**************************************************************************************************/
 /**************************************************************************************************/

@@ -8,5 +8,5 @@ class Model
 	std::vector<Animation> m_animations;
 public:
 	void Load(const aiScene *scene);
-	void Draw();
+	void Draw(Shader &shader, glm::mat4 modelMatrix);
 };
