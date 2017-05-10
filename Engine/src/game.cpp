@@ -9,42 +9,14 @@
 #define SCREEN_WIDTH 1600.0f
 #define SCREEN_HEIGHT 1200.0f
 
-
 /**************************************************************************************************
  * TEST CODE
 /**************************************************************************************************/
-static const std::vector<glm::vec2> UVs = {
-	{ 0, 0 },
-	{ 1, 1 },
-	{ 0, 1 },
 
-	{ 0, 0 },
-	{ 1, 0 },
-	{ 1, 1 }
-};
+glm::vec3 lightSource[5];
+GLfloat lightPower[5];
+glm::vec3 lightColor[5];
 
-static const std::vector<glm::vec3> points = {
-	//Upper Left Triangle
-	{ -1, -1, -10 },
-	{ 1, 1, -10 },
-	{ -1, 1, -10 },
-	//Lower Right Triangle
-	{ -1, -1, -10 },
-	{ 1, -1, -10 },
-	{ 1, 1, -10 }
-
-
-	//Colors!
-	//{1, .5, 1},
-	//{.5, 1, 0},
-	//{0, .5, 1},
-
-	//Barycentric!
-	//{1, 0, 0 },
-	//{0, 1, 0 },
-	//{0, 0, 1 }
-}
-;
 /**************************************************************************************************/
 sf::Time Game::Time()
 {
@@ -60,8 +32,9 @@ Entity *e;// = NewEntity();
 /**************************************************************************************************/
 void Game::Startup()
 {
-
 	int err;
+	m_process = false;
+	m_screen = glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT);
 	m_contextSettings.depthBits = 24;
 	m_contextSettings.stencilBits = 8;
 	m_contextSettings.antialiasingLevel = 4;
@@ -79,30 +52,43 @@ void Game::Startup()
 
 	//m_modelMatrix = glm::mat4(1.0);
 	m_viewMatrix = glm::mat4(1.0);
-	m_cameraPosition = glm::vec3(0, 0, 10);
+	m_cameraPosition = glm::vec3(0, 0, 5);
 	m_cameraRotation = glm::vec3(0, 0, 0);
 	m_projectionMatrix = glm::perspective(glm::radians(35.0f), 
-							SCREEN_WIDTH / SCREEN_HEIGHT, 1.0f, 100.0f);
+							SCREEN_WIDTH / (SCREEN_HEIGHT + 200), 1.0f, 10.0f);
 	glEnable(GL_DEPTH_TEST); // enable depth-testing
 	glDepthFunc(GL_LESS); // depth-testing interprets a smaller value as "closer"
 	glGenBuffers(1, &m_vbo);
 	glGenBuffers(1, &m_UVbo);
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	//e->SetVertices(points);
-	//std::vector<glm::vec3> v = e->Vertices();
-	//glBufferData(GL_ARRAY_BUFFER, e->Vertices().size() * sizeof(glm::vec3), &e->Vertices()[0][0], GL_STATIC_DRAW);
-	//glBindBuffer(GL_ARRAY_BUFFER, m_UVbo);
-	//e->SetUVs(UVs);
-	//glBufferData(GL_ARRAY_BUFFER, e->UVs().size() * sizeof(glm::vec2), &e->UVs()[0][0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);	
 	m_lastUpdateTime = m_clock.getElapsedTime();
 	setup_python();
 	m_currentShader = LoadShader("Default", "uv.vert", "uv.frag");
+	m_currentShader = LoadShader("Lit", "lit.vert", "lit.frag");
+	lightPower[0] = 20;
+	lightSource[0] = glm::vec3(5, 1, 10);
+	lightColor[0] = glm::vec3(1, 0, 0);
+	lightPower[1] = 50;
+	lightSource[1] = glm::vec3(-3, -3, 10);
+	lightColor[1] = glm::vec3(0, 1, 1);
+	glUseProgram(m_currentShader->GetProgramID());
+	//glEnable(GL_MULTISAMPLE);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+	glUniform3fv(m_currentShader->Uniform("LightPosition_worldspace"), 5, &lightSource[0][0]);
+	glUniform1fv(m_currentShader->Uniform("LightPower"), 5, &lightPower[0]);
+	glUniform3fv(m_currentShader->Uniform("LightColor"), 5, &lightColor[0][0]);
 	json dict = LoadDictionary("data/test.def");
 	e = NewEntity();
 	e->LoadFromDict(dict);
-	e->Translate(glm::vec3(0, 0, -90));
-	//e->SetRotation(glm::vec3(90, 0, 0));
+	e->Translate(glm::vec3(0, 0, -5));
+//	e->SetRotation(glm::vec3(90, 0, 30));
+	m_player = e;
+	Shader *testShader = LoadShader("Postprocess", "postprocess.vert", "postprocess.frag");
 	printf("%s\n", dict.dump().c_str());
+	m_testProcess = new PostProcess(testShader);
+	m_testProcess2 = new PostProcess(testShader);
+
 	return;
 }
 /**************************************************************************************************/
@@ -117,28 +103,37 @@ void Game::Input()
 			switch (event.key.code)
 			{
 			case sf::Keyboard::Right:
-				game->TranslateCamera(glm::vec3(.01f, 0, 0));
+				TranslateCamera(glm::vec3(-.05f, 0, 0));
 				break;
 			case sf::Keyboard::Left:
-				game->TranslateCamera(glm::vec3(-.01f, 0, 0));
+				TranslateCamera(glm::vec3(.05f, 0, 0));
 				break;
 			case sf::Keyboard::Up:
-				game->TranslateCamera(glm::vec3(0, .01f, 0));
+				TranslateCamera(glm::vec3(0, -.05f, 0));
 				break;
 			case sf::Keyboard::Down:
-				game->TranslateCamera(glm::vec3(0, -.01f, 0));
+				TranslateCamera(glm::vec3(0, .05f, 0));
+				break;
+			case sf::Keyboard::LBracket:
+				m_player->SetRotation(m_player->Rotation() + glm::vec3(0, .05f, 0));
+				break;
+			case sf::Keyboard::RBracket:
+				m_player->SetRotation(m_player->Rotation() - glm::vec3(0, .05f, 0));
 				break;
 			case sf::Keyboard::A:
-				game->RotateCamera(glm::vec3(0, 0, .01f));
+				RotateCamera(glm::vec3(0, 0, .01f));
 				break;
 			case sf::Keyboard::D:
-				game->RotateCamera(glm::vec3(0, 0, -.01f));
+				RotateCamera(glm::vec3(0, 0, -.01f));
 				break;
 			case sf::Keyboard::W:
-				game->RotateCamera(glm::vec3(0, .01f, 0));
+				RotateCamera(glm::vec3(0, .01f, 0));
 				break;
 			case sf::Keyboard::S:
-				game->RotateCamera(glm::vec3(0, -.01f, 0));
+				RotateCamera(glm::vec3(0, -.01f, 0));
+				break;
+			case sf::Keyboard::Tab:
+				m_process = (m_process+1)%3;
 				break;
 			}
 	}
@@ -146,15 +141,88 @@ void Game::Input()
 /**************************************************************************************************/
 void Game::Draw()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	m_viewMatrix = glm::lookAt(m_cameraPosition, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	m_viewMatrix = glm::inverse(glm::translate(glm::mat4(1), m_cameraPosition) * glm::eulerAngleXYZ(m_cameraRotation.x, m_cameraRotation.y, m_cameraRotation.z));
 	m_MVP = m_projectionMatrix * m_viewMatrix;
-	for (std::vector<Entity>::iterator it = m_entities.begin(); it != m_entities.end(); it++)
-		if(it->InUse())
-			it->Draw(*m_currentShader, m_MVP);
+	
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	if (m_process)
+	{
+		m_testProcess->Enable();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_DEPTH_TEST);
+		for (std::vector<Entity>::iterator it = m_entities.begin(); it != m_entities.end(); it++)
+			if (it->InUse())
+				it->Draw(*m_currentShader, m_MVP);
+		Shader *processShader = m_testProcess->GetShader();
+		Shader *prevShader = m_currentShader;
+		m_currentShader = processShader;
+		processShader->Use();
+		glUniform1i(processShader->Uniform("ScreenWidth"), SCREEN_WIDTH);
+		glUniform1i(processShader->Uniform("ScreenHeight"), SCREEN_HEIGHT);
+		glm::mat3 m = glm::mat3(-1, -1, 0,
+								-1, 0, 1,
+								0, 1, 1);
+		glUniformMatrix3fv(processShader->Uniform("kernel"), 1, GL_FALSE, &m[0][0]);
+		m_testProcess->Disable();
+		if (m_process == 2)	
+		{
+			m_testProcess2->Enable();
+
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glEnable(GL_DEPTH_TEST);
+			m_testProcess->RenderQuad();
+			m_testProcess2->Disable();
+			m = (1.0f / 16) * glm::mat3(1, 2, 1,
+				2, 4, 2,
+				1, 2, 1);
+			glUniformMatrix3fv(processShader->Uniform("kernel"), 1, GL_FALSE, &m[0][0]);
+
+			m_testProcess2->RenderQuad();
+		}
+		else {
+			m_testProcess->RenderQuad();
+		}
+		m_currentShader = prevShader;
+		m_currentShader->Use();
+	}
+	else {
+		for (std::vector<Entity>::iterator it = m_entities.begin(); it != m_entities.end(); it++)
+			if (it->InUse())
+				it->Draw(*m_currentShader, m_MVP);
+	}
 	m_window.display();
 }
 /**************************************************************************************************/
+/*
+//Glow
+GLuint fbo;
+glGenFramebuffers(1, &fbo);
+glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+GLuint textures[3];
+glGenTextures(2, textures);
+glBindTexture(GL_TEXTURE_2D, textures[0]);
+glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCREEN_WIDTH,SCREEN_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textures[0], 0);
+//	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, SCREEN_WIDTH, HEIGHT, 0,
+//		GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
+
+//	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, texture, 0);
+GLuint rbo;
+glGenRenderbuffers(1, &rbo);
+glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCREEN_WIDTH, SCREEN_HEIGHT);
+glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+printf("ERROR::FRAMEBUFFER:: Framebuffer is not complete!\n");
+glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+for (std::vector<Entity>::iterator it = m_entities.begin(); it != m_entities.end(); it++)
+if (it->InUse())
+it->Draw(*m_currentShader, m_MVP);
+glBindFramebuffer(GL_FRAMEBUFFER, 0);
+*/
 void Game::Update()
 {
 	for (std::vector<Entity>::iterator it = m_entities.begin(); it != m_entities.end(); it++)
@@ -276,6 +344,7 @@ void Game::UseShader(std::string name)
 	if (s)
 		s->Use();
 }
+
 /**************************************************************************************************/
 void Game::TranslateCamera(glm::vec3 vector)
 {
@@ -360,6 +429,11 @@ glm::mat4 Game::GetViewMatrix()
 glm::mat4 Game::GetProjectionMatrix()
 {
 	return m_projectionMatrix;
+}
+/**************************************************************************************************/
+Shader *Game::GetCurrentShader()
+{
+	return m_currentShader;
 }
 /**************************************************************************************************/
 /**************************************************************************************************/

@@ -19,11 +19,17 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{355d4d73-5cee-4dce-bad2-dc08086ed94c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shaders\Test">
-      <UniqueIdentifier>{a7247c10-d01a-4594-8ec6-26fb0d850e42}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Shaders\UV">
       <UniqueIdentifier>{74924a06-7b3f-40f7-9bb1-245eb1dc8ec2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Lit">
+      <UniqueIdentifier>{82444cec-7f46-4105-ab98-d0daaf9caf22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Postprocess">
+      <UniqueIdentifier>{874f4cb5-9f88-4768-ac75-539fd55f12e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Postprocess\Test">
+      <UniqueIdentifier>{a7247c10-d01a-4594-8ec6-26fb0d850e42}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -61,6 +67,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\postprocess.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -101,16 +110,19 @@
     <ClInclude Include="include\texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\postprocess.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Mortal Hymn\scripts\testFSM.py">
       <Filter>Scripts</Filter>
     </None>
     <None Include="..\Mortal Hymn\shaders\test.frag">
-      <Filter>Shaders\Test</Filter>
+      <Filter>Shaders\Postprocess\Test</Filter>
     </None>
     <None Include="..\Mortal Hymn\shaders\test.vert">
-      <Filter>Shaders\Test</Filter>
+      <Filter>Shaders\Postprocess\Test</Filter>
     </None>
     <None Include="..\Mortal Hymn\shaders\uv.frag">
       <Filter>Shaders\UV</Filter>
@@ -123,6 +135,18 @@
     </None>
     <None Include="..\Mortal Hymn\data\cube.def">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\Mortal Hymn\shaders\lit.frag">
+      <Filter>Shaders\Lit</Filter>
+    </None>
+    <None Include="..\Mortal Hymn\shaders\lit.vert">
+      <Filter>Shaders\Lit</Filter>
+    </None>
+    <None Include="..\Mortal Hymn\shaders\postprocess.frag">
+      <Filter>Shaders\Postprocess</Filter>
+    </None>
+    <None Include="..\Mortal Hymn\shaders\postprocess.vert">
+      <Filter>Shaders\Postprocess</Filter>
     </None>
   </ItemGroup>
 </Project>

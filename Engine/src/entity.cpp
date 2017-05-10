@@ -58,11 +58,14 @@ void Entity::SetUVs(std::vector<glm::vec2> UVs)
 
 void Entity::DrawModel(Shader &shader, glm::mat4 MVP)
 {
-	glUseProgram(shader.GetProgramID());
-	glm::mat4 modelMatrix = (glm::translate(glm::mat4(1), m_position) * glm::eulerAngleXYZ(m_rotation.x, m_rotation.y, m_rotation.z));
+	GLuint prevShader = game->GetCurrentShader()->GetProgramID();
+	if(shader.GetProgramID() != prevShader)
+		glUseProgram(shader.GetProgramID());
+	glm::mat4 modelMatrix = MVP * (glm::translate(glm::mat4(1), m_position) * glm::eulerAngleXYZ(m_rotation.x, m_rotation.y, m_rotation.z));
 	glUniformMatrix4fv(shader.Uniform("MVP"), 1, GL_FALSE, &modelMatrix[0][0]);
 	m_model->Draw(shader, modelMatrix);
-	glUseProgram(0);
+	if (shader.GetProgramID() != prevShader)
+		glUseProgram(prevShader);
 }
 
 void Entity::Draw(Shader &shader, glm::mat4 MVP)
@@ -75,10 +78,10 @@ void Entity::Draw(Shader &shader, glm::mat4 MVP)
 	if (!m_vertices.size())
 		return;
 	glUseProgram(shader.GetProgramID());
-	glm::mat4 modelMatrix = glm::eulerAngleXYZ(m_rotation.x, m_rotation.y, m_rotation.z)
-		* glm::translate(glm::mat4(1), m_position)
+	glm::mat4 modelMatrix = glm::translate(glm::mat4(1), m_position) 
+		* glm::eulerAngleXYZ(m_rotation.x, m_rotation.y, m_rotation.z)
 		* glm::scale(glm::mat4(1), m_scale);
-	//MVP  =modelMatrix * MVP;
+	MVP  =MVP * modelMatrix;
 	glUniformMatrix4fv(shader.Uniform("MVP"), 1, GL_FALSE, &MVP[0][0]);
 	if (m_texture != NULL)
 		m_texture->Bind();
@@ -151,6 +154,7 @@ void Entity::Update()
 void Entity::Initialize()
 {
 	memset(this, 0, sizeof(Entity));
+	m_scale = glm::vec3(1);
 	m_inUse = true;
 }
 

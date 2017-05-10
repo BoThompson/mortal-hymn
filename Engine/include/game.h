@@ -14,6 +14,7 @@ using json = nlohmann::json;
 #include <gl\glew.h>
 #include <glm\glm.hpp>
 #include <glm\gtx\transform.hpp>
+#include <glm\gtx\euler_angles.hpp>
 #include <SFML\graphics.hpp>
 #include <SFML\OpenGL.hpp>
 #include <SFML\Graphics\Texture.hpp>
@@ -25,6 +26,7 @@ using json = nlohmann::json;
 #include <assimp\postprocess.h>
 #include "shader.h"
 #include "texture.h"
+#include "postprocess.h"
 #include "mesh.h"
 #include "animation.h"
 #include "model.h"
@@ -53,6 +55,9 @@ using json = nlohmann::json;
  **************************************************************************************************/
 class Game
 {
+	PostProcess *m_testProcess; /**< The test postprocess */
+	PostProcess *m_testProcess2;
+	Entity *m_player; /**< The player's entity */
 	sf::Clock m_clock;  /**< The clock */
 	sf::Window m_window;	/**< The window */
 	bool m_ended;   /**< True if ended */
@@ -74,6 +79,7 @@ class Game
 	sf::ContextSettings m_contextSettings;  /**< The context settings */
 	GLuint m_vbo;
 	GLuint m_UVbo;
+	short m_process;
 
 public:
 
@@ -122,8 +128,8 @@ public:
 	 *
 	 * @brief	Prepares this object for use.
 	 *
-	 * @author	Aimle
-	 * @date	3/25/2017
+	 * @author	Bo Thompson
+	 * @date	4/27/2017
 	 **************************************************************************************************/
 	void Startup();
 
@@ -217,6 +223,19 @@ public:
 	 * @return	Null if it fails, else the shader.
 	 **************************************************************************************************/
 	Shader *GetShader(std::string name);
+
+	/**************************************************************************************************/
+	/**
+	 * @fn	Shader Game::*GetCurrentShader();
+	 *
+	 * @brief	Gets current shader.
+	 *
+	 * @author	Bo Thompson
+	 * @date	4/18/2017
+	 *
+	 * @return	Null if it fails, else the current shader.
+	 **************************************************************************************************/
+	Shader *GetCurrentShader();
 
 	/**************************************************************************************************/
 	/**
@@ -430,6 +449,7 @@ public:
 	 * @return	The projection matrix.
 	 **************************************************************************************************/
 	glm::mat4 GetProjectionMatrix();
+
 };
 
 extern Game *game;  /**< The game */
